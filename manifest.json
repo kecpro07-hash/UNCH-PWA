@@ -2,7 +2,7 @@
   "name": "УНЧ - У Нас Чисто",
   "short_name": "УНЧ",
   "description": "Сервис выноса мусора",
-  "start_url": "/",
+  "start_url": "UNCH-PWA",
   "display": "standalone",
   "background_color": "#FF8C00",
   "theme_color": "#FF8C00",
