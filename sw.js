@@ -1,16 +1,14 @@
 const CACHE_NAME = 'unch-cache-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/order.html',
-  '/orders.html',
-  '/profile.html',
-  '/reviews.html',
-  '/css/style.css',
-  '/js/app.js',
-  '/js/api.js',
-  '/js/db.js',
-  '/manifest.json'
+  '/UNCH-PWA/',
+  '/UNCH-PWA/index.html',
+  '/UNCH-PWA/profile.html',
+  '/UNCH-PWA/order.html',
+  '/UNCH-PWA/orders.html',
+  '/UNCH-PWA/reviews.html',
+  '/UNCH-PWA/css/style.css',
+  '/UNCH-PWA/js/app.js',
+  '/UNCH-PWA/manifest.json'
 ];
 
 // Установка Service Worker
