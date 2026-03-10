@@ -274,6 +274,24 @@
     </style>
 </head>
 <body>
+
+
+    <script>
+    // Проверка авторизации
+    document.addEventListener('DOMContentLoaded', function() {
+        const currentUser = localStorage.getItem('currentUser');
+        if (!currentUser) {
+            window.location.href = 'register.html';
+        } else {
+            const user = JSON.parse(currentUser);
+            document.getElementById('profileName').textContent = user.name || 'Пользователь';
+        }
+    });
+</script>
+
+
+
+    
     <div class="header">
         <div class="header-title">🚮 УНЧ</div>
         <div class="header-close" onclick="closeApp()">✕</div>
