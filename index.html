@@ -12,114 +12,345 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#FF8C00">
     
-    <!-- Иконки (временно убираем ссылки на файлы, пока не загрузишь иконки) -->
-    <!-- <link rel="apple-touch-icon" href="icons/icon-192.png"> -->
-    <!-- <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png"> -->
-    <!-- <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png"> -->
-    
     <!-- Манифест -->
     <link rel="manifest" href="manifest.json">
     
-    <!-- Стили -->
-    <link rel="stylesheet" href="css/style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fa;
+            padding: 16px;
+            padding-bottom: 80px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header-title {
+            font-size: 28px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #FF8C00, #FF4500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .header-close {
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            cursor: pointer;
+        }
+
+        .profile-avatar {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #FF8C00, #FF4500);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .profile-info {
+            flex: 1;
+        }
+
+        .profile-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .profile-phone {
+            font-size: 14px;
+            color: #999;
+        }
+
+        .profile-arrow {
+            font-size: 24px;
+            color: #999;
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, #FF8C00, #FF4500);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+            color: white;
+        }
+
+        .balance-item {
+            text-align: center;
+        }
+
+        .balance-label {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-bottom: 4px;
+        }
+
+        .balance-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .main-button {
+            width: 100%;
+            background: linear-gradient(135deg, #FF8C00, #FF4500);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            padding: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .menu-item {
+            background: white;
+            padding: 20px 8px;
+            border-radius: 16px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .menu-icon {
+            font-size: 28px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .menu-text {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .info-card {
+            background: white;
+            border-radius: 20px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-price {
+            font-weight: 600;
+            color: #FF8C00;
+        }
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            padding: 12px 16px 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .nav-item {
+            flex: 1;
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .nav-item.active {
+            color: #FF8C00;
+        }
+
+        .nav-icon {
+            font-size: 24px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .install-banner {
+            position: fixed;
+            bottom: 80px;
+            left: 16px;
+            right: 16px;
+            background: white;
+            border-radius: 30px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            display: none;
+        }
+
+        .install-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #FF8C00, #FF4500);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: white;
+        }
+
+        .install-text {
+            flex: 1;
+        }
+
+        .install-title {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .install-subtitle {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .install-button {
+            background: #FF8C00;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <div class="app">
-        <!-- Шапка -->
-        <div class="header">
-            <div class="header-title">🚮 УНЧ</div>
-            <div class="header-close" onclick="closeApp()">✕</div>
+    <div class="header">
+        <div class="header-title">🚮 УНЧ</div>
+        <div class="header-close" onclick="closeApp()">✕</div>
+    </div>
+
+    <div class="profile-card" onclick="goToProfile()">
+        <div class="profile-avatar" id="profileAvatar">👤</div>
+        <div class="profile-info">
+            <div class="profile-name" id="profileName">Загрузка...</div>
+            <div class="profile-phone" id="profilePhone"></div>
         </div>
+        <div class="profile-arrow">›</div>
+    </div>
 
-        <!-- Профиль -->
-        <div class="profile-card" id="profileCard" onclick="goToProfile()">
-            <div class="profile-avatar" id="profileAvatar">👤</div>
-            <div class="profile-info">
-                <div class="profile-name" id="profileName">Загрузка...</div>
-                <div class="profile-phone" id="profilePhone"></div>
-            </div>
-            <div class="profile-arrow">›</div>
+    <div class="balance-card">
+        <div class="balance-item">
+            <div class="balance-label">Заказов</div>
+            <div class="balance-value" id="ordersCount">0</div>
         </div>
-
-        <!-- Баланс/статус -->
-        <div class="balance-card">
-            <div class="balance-item">
-                <div class="balance-label">Заказов</div>
-                <div class="balance-value" id="ordersCount">0</div>
-            </div>
-            <div class="balance-item">
-                <div class="balance-label">Отзывов</div>
-                <div class="balance-value" id="reviewsCount">0</div>
-            </div>
-            <div class="balance-item">
-                <div class="balance-label">Рейтинг</div>
-                <div class="balance-value" id="userRating">5.0</div>
-            </div>
+        <div class="balance-item">
+            <div class="balance-label">Отзывов</div>
+            <div class="balance-value" id="reviewsCount">0</div>
         </div>
-
-        <!-- Главная кнопка -->
-        <button class="main-button" onclick="window.location.href='order.html'">
-            <span class="main-button-icon">🗑️</span>
-            ЗАКАЗАТЬ ВЫНОС
-        </button>
-
-        <!-- Меню -->
-        <div class="menu-grid">
-            <div class="menu-item" onclick="window.location.href='orders.html'">
-                <span class="menu-icon">📋</span>
-                <span class="menu-text">Мои заказы</span>
-                <span class="menu-badge" id="activeOrdersBadge"></span>
-            </div>
-            <div class="menu-item" onclick="window.location.href='reviews.html'">
-                <span class="menu-icon">⭐</span>
-                <span class="menu-text">Отзывы</span>
-                <span class="menu-rating" id="averageRating">4.9</span>
-            </div>
-            <div class="menu-item" onclick="window.location.href='profile.html'">
-                <span class="menu-icon">⚙️</span>
-                <span class="menu-text">Настройки</span>
-            </div>
-        </div>
-
-        <!-- Информация о работе -->
-        <div class="info-card">
-            <div class="info-row">
-                <span>💰 1 пакет</span>
-                <span class="info-price">100₽</span>
-            </div>
-            <div class="info-row">
-                <span>📦 2+ пакета</span>
-                <span class="info-price">+25₽ за каждый</span>
-            </div>
-            <div class="info-row">
-                <span>⏰ Будни</span>
-                <span>20:00 - 23:30</span>
-            </div>
-            <div class="info-row">
-                <span>⏰ Выходные</span>
-                <span>19:00 - 01:00</span>
-            </div>
-        </div>
-
-        <!-- Нижняя навигация -->
-        <div class="bottom-nav">
-            <div class="nav-item active" onclick="window.location.href='index.html'">
-                <span class="nav-icon">🏠</span>
-                <span class="nav-text">Главная</span>
-            </div>
-            <div class="nav-item" onclick="window.location.href='orders.html'">
-                <span class="nav-icon">📋</span>
-                <span class="nav-text">Заказы</span>
-            </div>
-            <div class="nav-item" onclick="window.location.href='profile.html'">
-                <span class="nav-icon">👤</span>
-                <span class="nav-text">Профиль</span>
-            </div>
+        <div class="balance-item">
+            <div class="balance-label">Рейтинг</div>
+            <div class="balance-value" id="userRating">5.0</div>
         </div>
     </div>
 
-    <!-- Баннер установки PWA -->
-    <div id="installBanner" class="install-banner" style="display: none;">
+    <button class="main-button" onclick="window.location.href='order.html'">
+        🗑️ ЗАКАЗАТЬ ВЫНОС
+    </button>
+
+    <div class="menu-grid">
+        <div class="menu-item" onclick="window.location.href='orders.html'">
+            <span class="menu-icon">📋</span>
+            <span class="menu-text">Мои заказы</span>
+        </div>
+        <div class="menu-item" onclick="window.location.href='reviews.html'">
+            <span class="menu-icon">⭐</span>
+            <span class="menu-text">Отзывы</span>
+        </div>
+        <div class="menu-item" onclick="window.location.href='profile.html'">
+            <span class="menu-icon">⚙️</span>
+            <span class="menu-text">Настройки</span>
+        </div>
+    </div>
+
+    <div class="info-card">
+        <div class="info-row">
+            <span>💰 1 пакет</span>
+            <span class="info-price">100₽</span>
+        </div>
+        <div class="info-row">
+            <span>📦 2+ пакета</span>
+            <span class="info-price">+25₽ за каждый</span>
+        </div>
+        <div class="info-row">
+            <span>⏰ Будни</span>
+            <span>20:00 - 23:30</span>
+        </div>
+        <div class="info-row">
+            <span>⏰ Выходные</span>
+            <span>19:00 - 01:00</span>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="window.location.href='index.html'">
+            <span class="nav-icon">🏠</span>
+            Главная
+        </div>
+        <div class="nav-item" onclick="window.location.href='orders.html'">
+            <span class="nav-icon">📋</span>
+            Заказы
+        </div>
+        <div class="nav-item" onclick="window.location.href='profile.html'">
+            <span class="nav-icon">👤</span>
+            Профиль
+        </div>
+    </div>
+
+    <div id="installBanner" class="install-banner">
         <div class="install-icon">🗑️</div>
         <div class="install-text">
             <div class="install-title">Установить УНЧ</div>
@@ -128,32 +359,75 @@
         <button class="install-button" onclick="installPWA()">Установить</button>
     </div>
 
-    <!-- Telegram WebApp -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    
     <!-- Скрипты -->
-    <script src="js/db.js"></script>
-    <script src="js/api.js"></script>
-    <script src="js/app.js"></script>
-    
-    <!-- Регистрация Service Worker -->
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js').catch(e => console.log('SW не зарегистрирован'));
-            });
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserData();
+        });
+
+        function loadUserData() {
+            const saved = localStorage.getItem('userProfile');
+            
+            if (saved) {
+                try {
+                    const user = JSON.parse(saved);
+                    document.getElementById('profileName').textContent = user.name || 'Пользователь';
+                    document.getElementById('profilePhone').textContent = user.phone || 'Телефон не указан';
+                    
+                    if (user.name) {
+                        const words = user.name.split(' ');
+                        let initials = '';
+                        for (let i = 0; i < Math.min(2, words.length); i++) {
+                            if (words[i][0]) initials += words[i][0].toUpperCase();
+                        }
+                        document.getElementById('profileAvatar').textContent = initials || '👤';
+                    }
+                } catch (e) {
+                    console.error('Ошибка:', e);
+                }
+            } else {
+                // Создаем нового пользователя
+                const newUser = {
+                    name: '',
+                    phone: '',
+                    address: '',
+                    short_id: generateId()
+                };
+                localStorage.setItem('userProfile', JSON.stringify(newUser));
+            }
         }
-        
-        // Функция закрытия
+
+        function generateId() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 4; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        function goToProfile() {
+            window.location.href = 'profile.html';
+        }
+
         function closeApp() {
             if (window.Telegram?.WebApp) {
                 window.Telegram.WebApp.close();
             }
         }
+
+        // PWA установка
+        let deferredPrompt;
         
-        // Переход в профиль
-        function goToProfile() {
-            window.location.href = 'profile.html';
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('installBanner').style.display = 'flex';
+        });
+
+        function installPWA() {
+            if (!deferredPrompt) return;
+            deferredPrompt.prompt();
         }
     </script>
 </body>
