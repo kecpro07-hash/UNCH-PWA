@@ -39,6 +39,8 @@
             font-size: 48px;
             margin: 0 auto 15px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            color: var(--primary);
+            font-weight: bold;
         }
         
         .profile-name-large {
@@ -108,6 +110,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            color: var(--primary);
         }
         
         .info-row {
@@ -116,6 +119,11 @@
             padding: 12px 0;
             border-bottom: 1px solid var(--border);
             cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .info-row:hover {
+            background: rgba(255, 140, 0, 0.05);
         }
         
         .info-row:last-child {
@@ -134,6 +142,7 @@
         .info-label {
             font-size: 12px;
             color: var(--text-secondary);
+            margin-bottom: 2px;
         }
         
         .info-value {
@@ -144,28 +153,53 @@
         .info-arrow {
             color: var(--text-secondary);
             font-size: 20px;
+            width: 30px;
+            text-align: right;
         }
         
         .edit-input {
             display: none;
-            margin-top: 8px;
+            margin-top: 15px;
+            padding: 15px;
+            background: rgba(255, 140, 0, 0.05);
+            border-radius: 16px;
+            animation: slideDown 0.3s;
         }
         
         .edit-input.active {
             display: block;
         }
         
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
         .save-button {
             background: var(--primary);
             color: white;
             border: none;
-            padding: 12px;
+            padding: 14px;
             border-radius: 16px;
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 600;
             width: 100%;
-            margin-top: 10px;
+            margin-top: 15px;
             cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .save-button:hover {
+            transform: scale(1.02);
+        }
+        
+        .save-button:active {
+            transform: scale(0.98);
+        }
+        
+        .save-button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
         }
         
         .logout-button {
@@ -177,8 +211,38 @@
             font-size: 16px;
             font-weight: 600;
             width: 100%;
-            margin: 20px 0;
+            margin: 20px 0 80px;
             cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .logout-button:hover {
+            background: rgba(244, 67, 54, 0.1);
+        }
+        
+        .logout-button:active {
+            transform: scale(0.98);
+        }
+        
+        .phone-note {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+        
+        .success-message {
+            background: #4CAF50;
+            color: white;
+            padding: 10px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 10px;
+            animation: fadeIn 0.3s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
     </style>
 </head>
@@ -213,6 +277,7 @@
                 <span>📋 Личные данные</span>
             </div>
             
+            <!-- Имя -->
             <div class="info-row" onclick="editField('name')">
                 <div class="info-icon">👤</div>
                 <div class="info-content">
@@ -223,9 +288,11 @@
             </div>
             <div class="edit-input" id="editName">
                 <input type="text" class="form-input" id="inputName" placeholder="Введите имя">
-                <button class="save-button" onclick="saveField('name')">Сохранить</button>
+                <div class="phone-note">Минимум 2 символа</div>
+                <button class="save-button" onclick="saveField('name')">💾 Сохранить</button>
             </div>
             
+            <!-- Телефон -->
             <div class="info-row" onclick="editField('phone')">
                 <div class="info-icon">📱</div>
                 <div class="info-content">
@@ -235,10 +302,12 @@
                 <div class="info-arrow">✏️</div>
             </div>
             <div class="edit-input" id="editPhone">
-                <input type="tel" class="form-input" id="inputPhone" placeholder="+7 (999) 123-45-67">
-                <button class="save-button" onclick="saveField('phone')">Сохранить</button>
+                <input type="tel" class="form-input" id="inputPhone" placeholder="+7 (999) 123-45-67" oninput="formatPhone(this)">
+                <div class="phone-note">10-11 цифр</div>
+                <button class="save-button" onclick="saveField('phone')">💾 Сохранить</button>
             </div>
             
+            <!-- Адрес -->
             <div class="info-row" onclick="editField('address')">
                 <div class="info-icon">📍</div>
                 <div class="info-content">
@@ -249,8 +318,8 @@
             </div>
             <div class="edit-input" id="editAddress">
                 <input type="text" class="form-input" id="inputAddress" placeholder="12, 3, 4, 567">
-                <div style="font-size: 12px; color: var(--text-secondary); margin: 5px 0;">дом, подъезд, этаж, квартира</div>
-                <button class="save-button" onclick="saveField('address')">Сохранить</button>
+                <div class="phone-note">дом, подъезд, этаж, квартира</div>
+                <button class="save-button" onclick="saveField('address')">💾 Сохранить</button>
             </div>
         </div>
 
@@ -288,7 +357,7 @@
             </div>
         </div>
 
-        <!-- Кнопка выхода (очистка данных) -->
+        <!-- Кнопка выхода -->
         <button class="logout-button" onclick="logout()">
             🚪 Выйти (очистить данные)
         </button>
@@ -320,34 +389,54 @@
         let userData = null;
         let editingField = null;
 
+        // Инициализация Telegram
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.expand();
+            tg.ready();
+            tg.setHeaderColor('#FF8C00');
+            tg.setBackgroundColor('#f8f9fa');
+        }
+
+        // Загрузка при старте
         document.addEventListener('DOMContentLoaded', async () => {
-            userData = await DB.getUser();
+            await loadUserData();
             await loadStats();
             updateUI();
         });
 
-        function updateUI() {
-            if (!userData) return;
+        async function loadUserData() {
+            userData = await DB.getUser();
             
-            // Обновляем шапку
-            document.getElementById('profileNameLarge').textContent = userData.name || 'Пользователь';
-            document.getElementById('profileIdLarge').textContent = userData.short_id ? `ID: ${userData.short_id}` : '';
-            
-            // Инициалы для аватара
-            if (userData.name) {
-                const initials = userData.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-                document.getElementById('profileAvatarLarge').textContent = initials;
+            // Если нет в локальной БД, создаем нового
+            if (!userData && tg?.initDataUnsafe?.user) {
+                const tgUser = tg.initDataUnsafe.user;
+                userData = {
+                    user_id: tgUser.id,
+                    name: tgUser.first_name + (tgUser.last_name ? ' ' + tgUser.last_name : ''),
+                    username: tgUser.username,
+                    phone: '',
+                    address: '',
+                    short_id: generateShortId()
+                };
+                await DB.saveUser(userData);
+                
+                // Отправляем на сервер
+                try {
+                    await API.createUser(userData);
+                } catch (error) {
+                    console.log('Офлайн режим, данные сохранены локально');
+                }
             }
-            
-            // Обновляем поля
-            document.getElementById('displayName').textContent = userData.name || 'Не указано';
-            document.getElementById('displayPhone').textContent = userData.phone || 'Не указано';
-            document.getElementById('displayAddress').textContent = userData.address || 'Не указано';
-            
-            // Заполняем поля ввода
-            document.getElementById('inputName').value = userData.name || '';
-            document.getElementById('inputPhone').value = userData.phone || '';
-            document.getElementById('inputAddress').value = userData.address || '';
+        }
+
+        function generateShortId() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let result = '';
+            for (let i = 0; i < 4; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
         }
 
         async function loadStats() {
@@ -360,8 +449,7 @@
                 document.getElementById('statOrders').textContent = orders.length;
                 document.getElementById('statCompleted').textContent = completed;
                 
-                // Рейтинг из отзывов
-                const reviews = await API.getReviews();
+                const reviews = await API.getReviews() || [];
                 const userReviews = reviews.filter(r => r.short_id === userData.short_id);
                 if (userReviews.length > 0) {
                     const avg = userReviews.reduce((sum, r) => sum + r.rating, 0) / userReviews.length;
@@ -371,7 +459,34 @@
                 }
             } catch (error) {
                 console.error('Ошибка загрузки статистики:', error);
+                document.getElementById('statOrders').textContent = '0';
+                document.getElementById('statCompleted').textContent = '0';
+                document.getElementById('statRating').textContent = '0';
             }
+        }
+
+        function updateUI() {
+            if (!userData) return;
+            
+            document.getElementById('profileNameLarge').textContent = userData.name || 'Пользователь';
+            document.getElementById('profileIdLarge').textContent = userData.short_id ? `ID: ${userData.short_id}` : '';
+            
+            if (userData.name) {
+                const words = userData.name.split(' ');
+                let initials = '';
+                for (let i = 0; i < Math.min(2, words.length); i++) {
+                    if (words[i][0]) initials += words[i][0].toUpperCase();
+                }
+                document.getElementById('profileAvatarLarge').textContent = initials || '👤';
+            }
+            
+            document.getElementById('displayName').textContent = userData.name || 'Не указано';
+            document.getElementById('displayPhone').textContent = userData.phone || 'Не указано';
+            document.getElementById('displayAddress').textContent = userData.address || 'Не указано';
+            
+            document.getElementById('inputName').value = userData.name || '';
+            document.getElementById('inputPhone').value = userData.phone || '';
+            document.getElementById('inputAddress').value = userData.address || '';
         }
 
         function editField(field) {
@@ -391,35 +506,77 @@
             const input = document.getElementById(`input${capitalize(field)}`);
             const newValue = input.value.trim();
             
-            if (!newValue && field !== 'phone') {
-                alert('Поле не может быть пустым');
+            if (field === 'name' && newValue.length < 2) {
+                alert('Имя должно содержать минимум 2 символа');
                 return;
             }
             
-            // Обновляем локально
-            userData[field] = newValue;
-            await DB.saveUser(userData);
+            if (field === 'phone' && newValue) {
+                const digits = newValue.replace(/\D/g, '');
+                if (digits.length < 10) {
+                    alert('Телефон должен содержать 10-11 цифр');
+                    return;
+                }
+            }
             
-            // Обновляем на сервере
+            const saveButton = event.target;
+            const originalText = saveButton.textContent;
+            saveButton.textContent = '⏳ Сохранение...';
+            saveButton.disabled = true;
+            
             try {
+                // Сохраняем локально
+                userData[field] = newValue;
+                await DB.saveUser(userData);
+                
+                // Отправляем на сервер
                 await API.updateUser(userData.user_id, {
                     [field]: newValue
                 });
+                
+                // Показываем успех
+                saveButton.textContent = '✅ Сохранено!';
+                setTimeout(() => {
+                    document.getElementById(`edit${capitalize(field)}`).classList.remove('active');
+                    editingField = null;
+                    updateUI();
+                }, 1000);
+                
             } catch (error) {
-                // Офлайн - сохраняем для синхронизации
+                console.error('Ошибка сохранения:', error);
+                
+                // Сохраняем для синхронизации
                 await DB.addToSync({
                     type: 'update_user',
                     user_id: userData.user_id,
                     data: {[field]: newValue}
                 });
+                
+                saveButton.textContent = '📦 Сохранено офлайн';
+                setTimeout(() => {
+                    document.getElementById(`edit${capitalize(field)}`).classList.remove('active');
+                    editingField = null;
+                    updateUI();
+                }, 1500);
             }
-            
-            // Закрываем редактирование
-            document.getElementById(`edit${capitalize(field)}`).classList.remove('active');
-            editingField = null;
-            
-            // Обновляем отображение
-            updateUI();
+        }
+
+        function formatPhone(input) {
+            let value = input.value.replace(/\D/g, '');
+            if (value.length > 0) {
+                if (value.length <= 1) {
+                    value = '+7';
+                } else if (value.length <= 4) {
+                    value = '+7 (' + value.slice(1, 4);
+                } else if (value.length <= 7) {
+                    value = '+7 (' + value.slice(1, 4) + ') ' + value.slice(4, 7);
+                } else if (value.length <= 9) {
+                    value = '+7 (' + value.slice(1, 4) + ') ' + value.slice(4, 7) + '-' + value.slice(7, 9);
+                } else {
+                    value = '+7 (' + value.slice(1, 4) + ') ' + value.slice(4, 7) + '-' + value.slice(7, 9) + '-' + value.slice(9, 11);
+                }
+                input.value = value;
+            }
         }
 
         function openSupport() {
@@ -432,7 +589,12 @@
         }
 
         function openRules() {
-            alert('📋 Правила сервиса:\n\n• Заказы принимаются за 10 минут до времени\n• Минимальное время на подготовку - 10 минут\n• Отмена заказа - @ваш_админ\n• Оплата после выполнения');
+            alert('📋 Правила сервиса:\n\n' +
+                  '• Заказы принимаются за 10 минут до времени\n' +
+                  '• Минимальное время на подготовку - 10 минут\n' +
+                  '• Отмена заказа - напишите @ваш_админ\n' +
+                  '• Оплата после выполнения\n' +
+                  '• Часы работы: будни 20:00-23:30, выходные 19:00-01:00');
         }
 
         async function logout() {
