@@ -1,11 +1,14 @@
-// API для работы с Neon
+// API для работы с сервером
 const API = {
-    baseUrl: 'https://your-api.onrender.com/api', // Замени на свой URL
+    // Замени на свой URL, когда будет готов
+    baseUrl: 'https://your-api.onrender.com/api',
     
     // ========== ПОЛЬЗОВАТЕЛИ ==========
+    
     async getUser(telegramId) {
         try {
             const response = await fetch(`${this.baseUrl}/user/${telegramId}`);
+            if (!response.ok) return null;
             return await response.json();
         } catch (error) {
             console.error('Ошибка получения пользователя:', error);
@@ -23,7 +26,7 @@ const API = {
             return await response.json();
         } catch (error) {
             console.error('Ошибка создания пользователя:', error);
-            return null;
+            throw error;
         }
     },
     
@@ -37,14 +40,16 @@ const API = {
             return await response.json();
         } catch (error) {
             console.error('Ошибка обновления пользователя:', error);
-            return null;
+            throw error;
         }
     },
     
     // ========== ЗАКАЗЫ ==========
+    
     async getOrders(telegramId) {
         try {
             const response = await fetch(`${this.baseUrl}/orders/${telegramId}`);
+            if (!response.ok) return [];
             return await response.json();
         } catch (error) {
             console.error('Ошибка получения заказов:', error);
@@ -62,7 +67,7 @@ const API = {
             return await response.json();
         } catch (error) {
             console.error('Ошибка создания заказа:', error);
-            return null;
+            throw error;
         }
     },
     
@@ -76,14 +81,16 @@ const API = {
             return await response.json();
         } catch (error) {
             console.error('Ошибка обновления заказа:', error);
-            return null;
+            throw error;
         }
     },
     
     // ========== ОТЗЫВЫ ==========
+    
     async getReviews() {
         try {
             const response = await fetch(`${this.baseUrl}/reviews`);
+            if (!response.ok) return [];
             return await response.json();
         } catch (error) {
             console.error('Ошибка получения отзывов:', error);
@@ -101,11 +108,12 @@ const API = {
             return await response.json();
         } catch (error) {
             console.error('Ошибка создания отзыва:', error);
-            return null;
+            throw error;
         }
     },
     
     // ========== ВРЕМЯ ==========
+    
     async getAvailableTimes() {
         try {
             const response = await fetch(`${this.baseUrl}/times`);
@@ -113,6 +121,20 @@ const API = {
         } catch (error) {
             console.error('Ошибка получения времени:', error);
             return {today: [], tomorrow: []};
+        }
+    },
+    
+    async checkTime(timestamp) {
+        try {
+            const response = await fetch(`${this.baseUrl}/check-time`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({timestamp})
+            });
+            return await response.json();
+        } catch (error) {
+            console.error('Ошибка проверки времени:', error);
+            return {available: false};
         }
     }
 };
