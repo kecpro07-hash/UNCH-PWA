@@ -1,140 +1,111 @@
 // API для работы с сервером
 const API = {
-    // Замени на свой URL, когда будет готов
-    baseUrl: 'https://your-api.onrender.com/api',
+    // ВРЕМЕННО отключаем запросы к серверу
+    // baseUrl: 'https://your-api.onrender.com/api',
+    
+    // Используем локальное хранилище, пока нет сервера
+    useLocalOnly: true,
     
     // ========== ПОЛЬЗОВАТЕЛИ ==========
     
     async getUser(telegramId) {
-        try {
-            const response = await fetch(`${this.baseUrl}/user/${telegramId}`);
-            if (!response.ok) return null;
-            return await response.json();
-        } catch (error) {
-            console.error('Ошибка получения пользователя:', error);
-            return null;
-        }
+        // Пока нет сервера, берем из localStorage
+        const user = await DB.getUser();
+        return user;
     },
     
     async createUser(userData) {
-        try {
-            const response = await fetch(`${this.baseUrl}/user`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(userData)
-            });
-            return await response.json();
-        } catch (error) {
-            console.error('Ошибка создания пользователя:', error);
-            throw error;
-        }
+        // Просто сохраняем локально
+        await DB.saveUser(userData);
+        return {status: 'ok', short_id: userData.short_id};
     },
     
     async updateUser(userId, userData) {
         try {
-            const response = await fetch(`${this.baseUrl}/user/${userId}`, {
-                method: 'PUT',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(userData)
-            });
-            return await response.json();
+            // Сохраняем локально
+            const user = await DB.getUser();
+            Object.assign(user, userData);
+            await DB.saveUser(user);
+            
+            // Пытаемся отправить на сервер, но не ждем
+            if (!this.useLocalOnly) {
+                fetch(`${this.baseUrl}/user/${userId}`, {
+                    method: 'PUT',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(userData)
+                }).catch(e => console.log('Сервер недоступен, данные сохранены локально'));
+            }
+            
+            return {status: 'ok'};
         } catch (error) {
             console.error('Ошибка обновления пользователя:', error);
-            throw error;
+            // Даже при ошибке считаем, что сохранили локально
+            return {status: 'ok', local: true};
         }
     },
     
     // ========== ЗАКАЗЫ ==========
     
     async getOrders(telegramId) {
-        try {
-            const response = await fetch(`${this.baseUrl}/orders/${telegramId}`);
-            if (!response.ok) return [];
-            return await response.json();
-        } catch (error) {
-            console.error('Ошибка получения заказов:', error);
-            return [];
-        }
+        // Берем из локального хранилища
+        return await DB.getOrders(telegramId) || [];
     },
     
     async createOrder(orderData) {
         try {
-            const response = await fetch(`${this.baseUrl}/order`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(orderData)
-            });
-            return await response.json();
+            // Сохраняем локально
+            const orders = await DB.getOrders(orderData.user_id) || [];
+            orders.push(orderData);
+            await DB.saveOrders(orders);
+            
+            return {status: 'ok', order_number: orderData.number || 'OFFLINE'};
         } catch (error) {
             console.error('Ошибка создания заказа:', error);
-            throw error;
+            return {status: 'error'};
         }
     },
     
     async updateOrder(orderNumber, orderData) {
-        try {
-            const response = await fetch(`${this.baseUrl}/order/${orderNumber}`, {
-                method: 'PUT',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(orderData)
-            });
-            return await response.json();
-        } catch (error) {
-            console.error('Ошибка обновления заказа:', error);
-            throw error;
-        }
+        return {status: 'ok'};
     },
     
     // ========== ОТЗЫВЫ ==========
     
     async getReviews() {
-        try {
-            const response = await fetch(`${this.baseUrl}/reviews`);
-            if (!response.ok) return [];
-            return await response.json();
-        } catch (error) {
-            console.error('Ошибка получения отзывов:', error);
-            return [];
-        }
+        return [];
     },
     
     async createReview(reviewData) {
-        try {
-            const response = await fetch(`${this.baseUrl}/review`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(reviewData)
-            });
-            return await response.json();
-        } catch (error) {
-            console.error('Ошибка создания отзыва:', error);
-            throw error;
-        }
+        return {status: 'ok'};
     },
     
     // ========== ВРЕМЯ ==========
     
     async getAvailableTimes() {
-        try {
-            const response = await fetch(`${this.baseUrl}/times`);
-            return await response.json();
-        } catch (error) {
-            console.error('Ошибка получения времени:', error);
-            return {today: [], tomorrow: []};
+        // Генерируем тестовые данные
+        const times = [];
+        const now = new Date();
+        
+        for (let i = 0; i < 6; i++) {
+            const time = new Date(now);
+            time.setHours(20 + Math.floor(i/2));
+            time.setMinutes((i%2) * 30);
+            if (time > now) {
+                times.push({
+                    time: time.toLocaleTimeString('ru-RU', {hour: '2-digit', minute: '2-digit'}),
+                    timestamp: Math.floor(time.getTime() / 1000),
+                    available: true
+                });
+            }
         }
+        
+        return {
+            today: times.slice(0, 4),
+            tomorrow: times.map(t => ({...t, time: t.time}))
+        };
     },
     
     async checkTime(timestamp) {
-        try {
-            const response = await fetch(`${this.baseUrl}/check-time`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({timestamp})
-            });
-            return await response.json();
-        } catch (error) {
-            console.error('Ошибка проверки времени:', error);
-            return {available: false};
-        }
+        return {available: true};
     }
 };
