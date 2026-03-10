@@ -1,20 +1,25 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <base href="/UNCH-PWA/">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>УНЧ - У Нас Чисто</title>
     
-    <!-- PWA мета-теги -->
+    <!-- Для iOS (обязательно!) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="УНЧ">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#FF8C00">
     
+    <!-- Иконки для iOS с абсолютными путями -->
+    <link rel="apple-touch-icon" href="https://kecpro07-hash.github.io/UNCH-PWA/icons/icon-192.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="https://kecpro07-hash.github.io/UNCH-PWA/icons/icon-152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="https://kecpro07-hash.github.io/UNCH-PWA/icons/icon-192.png">
+    <link rel="apple-touch-icon" sizes="167x167" href="https://kecpro07-hash.github.io/UNCH-PWA/icons/icon-192.png">
+    
     <!-- Манифест -->
-    <link rel="manifest" href="/UNCH-PWA/manifest.json">
+    <link rel="manifest" href="https://kecpro07-hash.github.io/UNCH-PWA/manifest.json">
     
     <style>
         * {
@@ -360,7 +365,6 @@
         <button class="install-button" onclick="installPWA()">Установить</button>
     </div>
 
-    <!-- Скрипты -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             loadUserData();
@@ -387,7 +391,6 @@
                     console.error('Ошибка:', e);
                 }
             } else {
-                // Создаем нового пользователя
                 const newUser = {
                     name: '',
                     phone: '',
@@ -417,7 +420,6 @@
             }
         }
 
-        // PWA установка
         let deferredPrompt;
         
         window.addEventListener('beforeinstallprompt', (e) => {
