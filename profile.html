@@ -394,8 +394,6 @@
         if (tg) {
             tg.expand();
             tg.ready();
-            tg.setHeaderColor('#FF8C00');
-            tg.setBackgroundColor('#f8f9fa');
         }
 
         // Загрузка при старте
@@ -408,7 +406,6 @@
         async function loadUserData() {
             userData = await DB.getUser();
             
-            // Если нет в локальной БД, создаем нового
             if (!userData && tg?.initDataUnsafe?.user) {
                 const tgUser = tg.initDataUnsafe.user;
                 userData = {
@@ -420,13 +417,6 @@
                     short_id: generateShortId()
                 };
                 await DB.saveUser(userData);
-                
-                // Отправляем на сервер
-                try {
-                    await API.createUser(userData);
-                } catch (error) {
-                    console.log('Офлайн режим, данные сохранены локально');
-                }
             }
         }
 
@@ -448,20 +438,9 @@
                 
                 document.getElementById('statOrders').textContent = orders.length;
                 document.getElementById('statCompleted').textContent = completed;
-                
-                const reviews = await API.getReviews() || [];
-                const userReviews = reviews.filter(r => r.short_id === userData.short_id);
-                if (userReviews.length > 0) {
-                    const avg = userReviews.reduce((sum, r) => sum + r.rating, 0) / userReviews.length;
-                    document.getElementById('statRating').textContent = avg.toFixed(1);
-                } else {
-                    document.getElementById('statRating').textContent = '5.0';
-                }
+                document.getElementById('statRating').textContent = '5.0';
             } catch (error) {
                 console.error('Ошибка загрузки статистики:', error);
-                document.getElementById('statOrders').textContent = '0';
-                document.getElementById('statCompleted').textContent = '0';
-                document.getElementById('statRating').textContent = '0';
             }
         }
 
@@ -506,6 +485,7 @@
             const input = document.getElementById(`input${capitalize(field)}`);
             const newValue = input.value.trim();
             
+            // Валидация
             if (field === 'name' && newValue.length < 2) {
                 alert('Имя должно содержать минимум 2 символа');
                 return;
@@ -519,23 +499,27 @@
                 }
             }
             
+            // Блокируем кнопку
             const saveButton = event.target;
             const originalText = saveButton.textContent;
             saveButton.textContent = '⏳ Сохранение...';
             saveButton.disabled = true;
             
             try {
-                // Сохраняем локально
+                // Обновляем данные
                 userData[field] = newValue;
+                
+                // Сохраняем в локальную БД
                 await DB.saveUser(userData);
                 
-                // Отправляем на сервер
-                await API.updateUser(userData.user_id, {
-                    [field]: newValue
-                });
+                // Пытаемся отправить на сервер (не ждем)
+                API.updateUser(userData.user_id, {[field]: newValue})
+                    .catch(e => console.log('Сервер недоступен'));
                 
                 // Показываем успех
                 saveButton.textContent = '✅ Сохранено!';
+                
+                // Закрываем поле через секунду
                 setTimeout(() => {
                     document.getElementById(`edit${capitalize(field)}`).classList.remove('active');
                     editingField = null;
@@ -544,20 +528,12 @@
                 
             } catch (error) {
                 console.error('Ошибка сохранения:', error);
+                saveButton.textContent = '❌ Ошибка';
                 
-                // Сохраняем для синхронизации
-                await DB.addToSync({
-                    type: 'update_user',
-                    user_id: userData.user_id,
-                    data: {[field]: newValue}
-                });
-                
-                saveButton.textContent = '📦 Сохранено офлайн';
                 setTimeout(() => {
-                    document.getElementById(`edit${capitalize(field)}`).classList.remove('active');
-                    editingField = null;
-                    updateUI();
-                }, 1500);
+                    saveButton.textContent = originalText;
+                    saveButton.disabled = false;
+                }, 2000);
             }
         }
 
@@ -580,12 +556,7 @@
         }
 
         function openSupport() {
-            const tg = window.Telegram?.WebApp;
-            if (tg) {
-                tg.openTelegramLink('https://t.me/ваш_админ');
-            } else {
-                window.open('https://t.me/ваш_админ', '_blank');
-            }
+            alert('Поддержка: @ваш_админ');
         }
 
         function openRules() {
