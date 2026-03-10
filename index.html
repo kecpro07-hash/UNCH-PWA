@@ -12,10 +12,10 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="theme-color" content="#FF8C00">
     
-    <!-- Иконки -->
-    <link rel="apple-touch-icon" href="icons/icon-192.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+    <!-- Иконки (временно убираем ссылки на файлы, пока не загрузишь иконки) -->
+    <!-- <link rel="apple-touch-icon" href="icons/icon-192.png"> -->
+    <!-- <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png"> -->
+    <!-- <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png"> -->
     
     <!-- Манифест -->
     <link rel="manifest" href="manifest.json">
@@ -28,7 +28,7 @@
         <!-- Шапка -->
         <div class="header">
             <div class="header-title">🚮 УНЧ</div>
-            <div class="header-close" onclick="Telegram?.WebApp?.close()">✕</div>
+            <div class="header-close" onclick="closeApp()">✕</div>
         </div>
 
         <!-- Профиль -->
@@ -140,8 +140,20 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js');
+                navigator.serviceWorker.register('sw.js').catch(e => console.log('SW не зарегистрирован'));
             });
+        }
+        
+        // Функция закрытия
+        function closeApp() {
+            if (window.Telegram?.WebApp) {
+                window.Telegram.WebApp.close();
+            }
+        }
+        
+        // Переход в профиль
+        function goToProfile() {
+            window.location.href = 'profile.html';
         }
     </script>
 </body>
