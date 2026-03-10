@@ -70,6 +70,7 @@
             font-size: 22px;
             font-weight: 600;
             margin-bottom: 5px;
+            color: #333;
         }
         
         .id {
@@ -234,6 +235,12 @@
             background: rgba(244,67,54,0.1);
             transform: scale(0.98);
         }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #999;
+        }
     </style>
 </head>
 <body>
@@ -259,8 +266,8 @@
                 <span class="edit-icon">✏️</span>
             </div>
             <div class="edit-form" id="editName">
-                <input type="text" id="inputName" placeholder="Введите имя">
-                <button class="save-btn" onclick="saveField('name')" id="saveNameBtn">Сохранить</button>
+                <input type="text" id="inputName" placeholder="Введите имя" value="">
+                <button class="save-btn" onclick="saveField('name')">Сохранить</button>
             </div>
         </div>
         
@@ -272,8 +279,8 @@
                 <span class="edit-icon">✏️</span>
             </div>
             <div class="edit-form" id="editPhone">
-                <input type="tel" id="inputPhone" placeholder="+7 (999) 123-45-67" oninput="formatPhone(this)">
-                <button class="save-btn" onclick="saveField('phone')" id="savePhoneBtn">Сохранить</button>
+                <input type="tel" id="inputPhone" placeholder="+7 (999) 123-45-67" value="" oninput="formatPhone(this)">
+                <button class="save-btn" onclick="saveField('phone')">Сохранить</button>
             </div>
         </div>
         
@@ -285,8 +292,8 @@
                 <span class="edit-icon">✏️</span>
             </div>
             <div class="edit-form" id="editAddress">
-                <input type="text" id="inputAddress" placeholder="12, 3, 4, 567">
-                <button class="save-btn" onclick="saveField('address')" id="saveAddressBtn">Сохранить</button>
+                <input type="text" id="inputAddress" placeholder="12, 3, 4, 567" value="">
+                <button class="save-btn" onclick="saveField('address')">Сохранить</button>
             </div>
         </div>
     </div>
@@ -332,19 +339,43 @@
         let editingField = null;
 
         // Загрузка при старте
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Страница загружена');
             loadUserData();
-            updateUI();
         });
 
         function loadUserData() {
+            console.log('Загрузка данных...');
+            
+            // Загружаем из localStorage
             const saved = localStorage.getItem('userProfile');
+            console.log('Сохраненные данные:', saved);
+            
             if (saved) {
-                userData = JSON.parse(saved);
+                try {
+                    userData = JSON.parse(saved);
+                    console.log('Данные загружены:', userData);
+                } catch (e) {
+                    console.error('Ошибка парсинга:', e);
+                    createNewUser();
+                }
             } else {
-                userData.short_id = generateId();
-                saveUserData();
+                console.log('Нет сохраненных данных, создаем нового');
+                createNewUser();
             }
+            
+            // Обновляем интерфейс
+            updateUI();
+        }
+
+        function createNewUser() {
+            userData = {
+                name: '',
+                phone: '',
+                address: '',
+                short_id: generateId()
+            };
+            saveUserData();
         }
 
         function generateId() {
@@ -357,41 +388,89 @@
         }
 
         function saveUserData() {
+            console.log('Сохраняем данные:', userData);
             localStorage.setItem('userProfile', JSON.stringify(userData));
         }
 
         function updateUI() {
-            // Обновляем отображение
-            document.getElementById('displayName').textContent = userData.name || 'Пользователь';
-            document.getElementById('displayId').textContent = userData.short_id ? `ID: ${userData.short_id}` : '';
-            document.getElementById('nameValue').textContent = userData.name || '—';
-            document.getElementById('phoneValue').textContent = userData.phone || '—';
-            document.getElementById('addressValue').textContent = userData.address || '—';
+            console.log('Обновляем интерфейс с данными:', userData);
+            
+            // Обновляем отображение имени
+            const displayName = document.getElementById('displayName');
+            if (displayName) {
+                displayName.textContent = userData.name || 'Пользователь';
+            }
+            
+            // Обновляем ID
+            const displayId = document.getElementById('displayId');
+            if (displayId) {
+                displayId.textContent = userData.short_id ? `ID: ${userData.short_id}` : '';
+            }
+            
+            // Обновляем поля
+            const nameValue = document.getElementById('nameValue');
+            if (nameValue) {
+                nameValue.textContent = userData.name || '—';
+            }
+            
+            const phoneValue = document.getElementById('phoneValue');
+            if (phoneValue) {
+                phoneValue.textContent = userData.phone || '—';
+            }
+            
+            const addressValue = document.getElementById('addressValue');
+            if (addressValue) {
+                addressValue.textContent = userData.address || '—';
+            }
             
             // Аватар
-            if (userData.name) {
-                const words = userData.name.split(' ');
-                let initials = '';
-                for (let i = 0; i < Math.min(2, words.length); i++) {
-                    if (words[i][0]) initials += words[i][0].toUpperCase();
+            const avatar = document.getElementById('avatar');
+            if (avatar) {
+                if (userData.name) {
+                    const words = userData.name.split(' ');
+                    let initials = '';
+                    for (let i = 0; i < Math.min(2, words.length); i++) {
+                        if (words[i][0]) initials += words[i][0].toUpperCase();
+                    }
+                    avatar.textContent = initials || '👤';
+                } else {
+                    avatar.textContent = '👤';
                 }
-                document.getElementById('avatar').textContent = initials || '👤';
             }
             
             // Заполняем поля ввода
-            document.getElementById('inputName').value = userData.name || '';
-            document.getElementById('inputPhone').value = userData.phone || '';
-            document.getElementById('inputAddress').value = userData.address || '';
+            const inputName = document.getElementById('inputName');
+            if (inputName) {
+                inputName.value = userData.name || '';
+            }
+            
+            const inputPhone = document.getElementById('inputPhone');
+            if (inputPhone) {
+                inputPhone.value = userData.phone || '';
+            }
+            
+            const inputAddress = document.getElementById('inputAddress');
+            if (inputAddress) {
+                inputAddress.value = userData.address || '';
+            }
         }
 
         function editField(field) {
+            console.log('Редактирование поля:', field);
+            
             // Закрываем предыдущее открытое поле
             if (editingField) {
-                document.getElementById(`edit${capitalize(editingField)}`).classList.remove('active');
+                const prevField = document.getElementById(`edit${capitalize(editingField)}`);
+                if (prevField) {
+                    prevField.classList.remove('active');
+                }
             }
             
             editingField = field;
-            document.getElementById(`edit${capitalize(field)}`).classList.add('active');
+            const editForm = document.getElementById(`edit${capitalize(field)}`);
+            if (editForm) {
+                editForm.classList.add('active');
+            }
         }
 
         function capitalize(str) {
@@ -417,12 +496,19 @@
         }
 
         function saveField(field) {
+            console.log('Сохранение поля:', field);
+            
             const input = document.getElementById(`input${capitalize(field)}`);
+            if (!input) {
+                console.error('Поле ввода не найдено');
+                return;
+            }
+            
             const newValue = input.value.trim();
-            const button = document.getElementById(`save${capitalize(field)}Btn`);
+            const button = event.target;
             
             // Валидация
-            if (field === 'name' && newValue.length < 2) {
+            if (field === 'name' && newValue.length < 2 && newValue.length > 0) {
                 alert('Имя должно содержать минимум 2 символа');
                 return;
             }
@@ -447,7 +533,10 @@
             
             // Закрываем форму через 500 мс
             setTimeout(() => {
-                document.getElementById(`edit${capitalize(field)}`).classList.remove('active');
+                const editForm = document.getElementById(`edit${capitalize(field)}`);
+                if (editForm) {
+                    editForm.classList.remove('active');
+                }
                 editingField = null;
                 
                 // Восстанавливаем кнопку
@@ -459,17 +548,16 @@
         function logout() {
             if (confirm('Очистить все данные?')) {
                 localStorage.removeItem('userProfile');
-                userData = {
-                    name: '',
-                    phone: '',
-                    address: '',
-                    short_id: generateId()
-                };
-                saveUserData();
+                createNewUser();
                 updateUI();
                 alert('✅ Данные очищены');
             }
         }
+
+        // Для отладки - смотрим что в localStorage при загрузке
+        window.addEventListener('load', function() {
+            console.log('Все данные в localStorage:', localStorage);
+        });
     </script>
 </body>
 </html>
