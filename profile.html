@@ -1,563 +1,93 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Профиль - УНЧ</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f5f5f5;
-            padding: 16px;
-            padding-bottom: 80px;
-        }
-        
-        .header {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .back-button {
-            font-size: 28px;
-            cursor: pointer;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: white;
-            border-radius: 50%;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        
-        .header-title {
-            font-size: 24px;
-            font-weight: 600;
-            color: #FF8C00;
-        }
-        
-        .profile-card {
-            background: white;
-            border-radius: 20px;
-            padding: 30px 20px;
-            text-align: center;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-        
-        .avatar {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, #FF8C00, #FF4500);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 36px;
-            color: white;
-            margin: 0 auto 15px;
-        }
-        
-        .name {
-            font-size: 22px;
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: #333;
-        }
-        
-        .id {
-            color: #999;
-            font-size: 14px;
-        }
-        
-        .section {
-            background: white;
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-        
-        .section-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #FF8C00;
-            margin-bottom: 20px;
-        }
-        
-        .field {
-            margin-bottom: 20px;
-        }
-        
-        .field-label {
-            font-size: 14px;
-            color: #999;
-            margin-bottom: 5px;
-        }
-        
-        .field-value {
-            font-size: 18px;
-            font-weight: 500;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 0;
-            border-bottom: 1px solid #eee;
-            cursor: pointer;
-        }
-        
-        .field-value:active {
-            background: rgba(255,140,0,0.05);
-        }
-        
-        .edit-icon {
-            color: #FF8C00;
-            font-size: 20px;
-        }
-        
-        .edit-form {
-            display: none;
-            margin-top: 15px;
-            padding: 15px;
-            background: #f9f9f9;
-            border-radius: 16px;
-        }
-        
-        .edit-form.active {
-            display: block;
-        }
-        
-        input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 12px;
-            font-size: 16px;
-            margin-bottom: 15px;
-        }
-        
-        input:focus {
-            outline: none;
-            border-color: #FF8C00;
-        }
-        
-        .save-btn {
-            width: 100%;
-            padding: 15px;
-            background: #FF8C00;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .save-btn:active {
-            transform: scale(0.98);
-        }
-        
-        .save-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .success-message {
-            background: #4CAF50;
-            color: white;
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-            margin-top: 10px;
-            animation: fadeIn 0.3s;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .bottom-nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: white;
-            display: flex;
-            padding: 12px 16px 20px;
-            border-top: 1px solid #eee;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-        }
-        
-        .nav-item {
-            flex: 1;
-            text-align: center;
-            color: #999;
-            text-decoration: none;
-            font-size: 12px;
-            cursor: pointer;
-        }
-        
-        .nav-item.active {
-            color: #FF8C00;
-        }
-        
-        .nav-icon {
-            font-size: 24px;
-            display: block;
-            margin-bottom: 4px;
-        }
-        
-        .logout-btn {
-            width: 100%;
-            padding: 16px;
-            background: transparent;
-            border: 2px solid #f44336;
-            color: #f44336;
-            border-radius: 30px;
-            font-size: 16px;
-            font-weight: 600;
-            margin: 20px 0 30px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .logout-btn:active {
-            background: rgba(244,67,54,0.1);
-            transform: scale(0.98);
-        }
-        
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: #999;
-        }
-    </style>
+    <title>Профиль</title>
 </head>
 <body>
-    <div class="header">
-        <div class="back-button" onclick="window.location.href='index.html'">←</div>
-        <div class="header-title">Профиль</div>
+    <h1>Профиль</h1>
+    
+    <div style="margin: 20px 0;">
+        <h2 id="displayName">Загрузка...</h2>
+        <p>ID: <span id="displayId">—</span></p>
     </div>
 
-    <div class="profile-card">
-        <div class="avatar" id="avatar">👤</div>
-        <div class="name" id="displayName">Загрузка...</div>
-        <div class="id" id="displayId"></div>
+    <div style="margin: 10px 0;">
+        <label>Имя:</label><br>
+        <input type="text" id="inputName" style="width:100%; padding:10px;">
     </div>
 
-    <div class="section">
-        <div class="section-title">📋 Личные данные</div>
-        
-        <!-- Имя -->
-        <div class="field">
-            <div class="field-label">Имя</div>
-            <div class="field-value" onclick="editField('name')">
-                <span id="nameValue">—</span>
-                <span class="edit-icon">✏️</span>
-            </div>
-            <div class="edit-form" id="editName">
-                <input type="text" id="inputName" placeholder="Введите имя" value="">
-                <button class="save-btn" onclick="saveField('name')">Сохранить</button>
-            </div>
-        </div>
-        
-        <!-- Телефон -->
-        <div class="field">
-            <div class="field-label">Телефон</div>
-            <div class="field-value" onclick="editField('phone')">
-                <span id="phoneValue">—</span>
-                <span class="edit-icon">✏️</span>
-            </div>
-            <div class="edit-form" id="editPhone">
-                <input type="tel" id="inputPhone" placeholder="+7 (999) 123-45-67" value="" oninput="formatPhone(this)">
-                <button class="save-btn" onclick="saveField('phone')">Сохранить</button>
-            </div>
-        </div>
-        
-        <!-- Адрес -->
-        <div class="field">
-            <div class="field-label">Адрес</div>
-            <div class="field-value" onclick="editField('address')">
-                <span id="addressValue">—</span>
-                <span class="edit-icon">✏️</span>
-            </div>
-            <div class="edit-form" id="editAddress">
-                <input type="text" id="inputAddress" placeholder="12, 3, 4, 567" value="">
-                <button class="save-btn" onclick="saveField('address')">Сохранить</button>
-            </div>
-        </div>
+    <div style="margin: 10px 0;">
+        <label>Телефон:</label><br>
+        <input type="text" id="inputPhone" style="width:100%; padding:10px;">
     </div>
 
-    <div class="section">
-        <div class="section-title">ℹ️ О сервисе</div>
-        <div style="padding: 10px 0; color: #666; line-height: 1.6;">
-            📞 Поддержка: @ваш_админ<br><br>
-            ⏰ Будни: 20:00-23:30<br>
-            ⏰ Выходные: 19:00-01:00<br><br>
-            💰 1 пакет = 100₽, далее +25₽
-        </div>
+    <div style="margin: 10px 0;">
+        <label>Адрес:</label><br>
+        <input type="text" id="inputAddress" style="width:100%; padding:10px;">
     </div>
 
-    <button class="logout-btn" onclick="logout()">
-        🚪 Очистить данные
-    </button>
-
-    <div class="bottom-nav">
-        <div class="nav-item" onclick="window.location.href='index.html'">
-            <span class="nav-icon">🏠</span>
-            Главная
-        </div>
-        <div class="nav-item" onclick="window.location.href='orders.html'">
-            <span class="nav-icon">📋</span>
-            Заказы
-        </div>
-        <div class="nav-item active" onclick="window.location.href='profile.html'">
-            <span class="nav-icon">👤</span>
-            Профиль
-        </div>
-    </div>
+    <button onclick="saveAll()" style="padding:15px; width:100%;">💾 Сохранить все</button>
+    <button onclick="clearAll()" style="padding:15px; width:100%; margin-top:10px;">🗑️ Очистить</button>
 
     <script>
-        // Данные пользователя
         let userData = {
             name: '',
             phone: '',
             address: '',
-            short_id: ''
+            id: 'ABC' + Math.floor(Math.random() * 1000)
         };
-        
-        let editingField = null;
 
-        // Загрузка при старте
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Страница загружена');
-            loadUserData();
+            loadData();
+            updateDisplay();
         });
 
-        function loadUserData() {
-            console.log('Загрузка данных...');
-            
-            // Загружаем из localStorage
-            const saved = localStorage.getItem('userProfile');
-            console.log('Сохраненные данные:', saved);
-            
+        function loadData() {
+            const saved = localStorage.getItem('simpleProfile');
             if (saved) {
-                try {
-                    userData = JSON.parse(saved);
-                    console.log('Данные загружены:', userData);
-                } catch (e) {
-                    console.error('Ошибка парсинга:', e);
-                    createNewUser();
-                }
-            } else {
-                console.log('Нет сохраненных данных, создаем нового');
-                createNewUser();
+                userData = JSON.parse(saved);
             }
-            
-            // Обновляем интерфейс
-            updateUI();
+            console.log('Загружено:', userData);
         }
 
-        function createNewUser() {
-            userData = {
-                name: '',
-                phone: '',
-                address: '',
-                short_id: generateId()
-            };
-            saveUserData();
+        function saveData() {
+            localStorage.setItem('simpleProfile', JSON.stringify(userData));
+            console.log('Сохранено:', userData);
         }
 
-        function generateId() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            let result = '';
-            for (let i = 0; i < 4; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return result;
+        function updateDisplay() {
+            document.getElementById('displayName').textContent = userData.name || 'Пользователь';
+            document.getElementById('displayId').textContent = userData.id;
+            
+            document.getElementById('inputName').value = userData.name || '';
+            document.getElementById('inputPhone').value = userData.phone || '';
+            document.getElementById('inputAddress').value = userData.address || '';
         }
 
-        function saveUserData() {
-            console.log('Сохраняем данные:', userData);
-            localStorage.setItem('userProfile', JSON.stringify(userData));
+        function saveAll() {
+            userData.name = document.getElementById('inputName').value;
+            userData.phone = document.getElementById('inputPhone').value;
+            userData.address = document.getElementById('inputAddress').value;
+            
+            saveData();
+            updateDisplay();
+            alert('✅ Сохранено!');
         }
 
-        function updateUI() {
-            console.log('Обновляем интерфейс с данными:', userData);
-            
-            // Обновляем отображение имени
-            const displayName = document.getElementById('displayName');
-            if (displayName) {
-                displayName.textContent = userData.name || 'Пользователь';
-            }
-            
-            // Обновляем ID
-            const displayId = document.getElementById('displayId');
-            if (displayId) {
-                displayId.textContent = userData.short_id ? `ID: ${userData.short_id}` : '';
-            }
-            
-            // Обновляем поля
-            const nameValue = document.getElementById('nameValue');
-            if (nameValue) {
-                nameValue.textContent = userData.name || '—';
-            }
-            
-            const phoneValue = document.getElementById('phoneValue');
-            if (phoneValue) {
-                phoneValue.textContent = userData.phone || '—';
-            }
-            
-            const addressValue = document.getElementById('addressValue');
-            if (addressValue) {
-                addressValue.textContent = userData.address || '—';
-            }
-            
-            // Аватар
-            const avatar = document.getElementById('avatar');
-            if (avatar) {
-                if (userData.name) {
-                    const words = userData.name.split(' ');
-                    let initials = '';
-                    for (let i = 0; i < Math.min(2, words.length); i++) {
-                        if (words[i][0]) initials += words[i][0].toUpperCase();
-                    }
-                    avatar.textContent = initials || '👤';
-                } else {
-                    avatar.textContent = '👤';
-                }
-            }
-            
-            // Заполняем поля ввода
-            const inputName = document.getElementById('inputName');
-            if (inputName) {
-                inputName.value = userData.name || '';
-            }
-            
-            const inputPhone = document.getElementById('inputPhone');
-            if (inputPhone) {
-                inputPhone.value = userData.phone || '';
-            }
-            
-            const inputAddress = document.getElementById('inputAddress');
-            if (inputAddress) {
-                inputAddress.value = userData.address || '';
+        function clearAll() {
+            if (confirm('Очистить данные?')) {
+                localStorage.removeItem('simpleProfile');
+                userData = {
+                    name: '',
+                    phone: '',
+                    address: '',
+                    id: 'ABC' + Math.floor(Math.random() * 1000)
+                };
+                updateDisplay();
+                alert('Данные очищены');
             }
         }
-
-        function editField(field) {
-            console.log('Редактирование поля:', field);
-            
-            // Закрываем предыдущее открытое поле
-            if (editingField) {
-                const prevField = document.getElementById(`edit${capitalize(editingField)}`);
-                if (prevField) {
-                    prevField.classList.remove('active');
-                }
-            }
-            
-            editingField = field;
-            const editForm = document.getElementById(`edit${capitalize(field)}`);
-            if (editForm) {
-                editForm.classList.add('active');
-            }
-        }
-
-        function capitalize(str) {
-            return str.charAt(0).toUpperCase() + str.slice(1);
-        }
-
-        function formatPhone(input) {
-            let value = input.value.replace(/\D/g, '');
-            if (value.length > 0) {
-                if (value.length <= 1) {
-                    value = '+7';
-                } else if (value.length <= 4) {
-                    value = '+7 (' + value.slice(1, 4);
-                } else if (value.length <= 7) {
-                    value = '+7 (' + value.slice(1, 4) + ') ' + value.slice(4, 7);
-                } else if (value.length <= 9) {
-                    value = '+7 (' + value.slice(1, 4) + ') ' + value.slice(4, 7) + '-' + value.slice(7, 9);
-                } else {
-                    value = '+7 (' + value.slice(1, 4) + ') ' + value.slice(4, 7) + '-' + value.slice(7, 9) + '-' + value.slice(9, 11);
-                }
-                input.value = value;
-            }
-        }
-
-        function saveField(field) {
-            console.log('Сохранение поля:', field);
-            
-            const input = document.getElementById(`input${capitalize(field)}`);
-            if (!input) {
-                console.error('Поле ввода не найдено');
-                return;
-            }
-            
-            const newValue = input.value.trim();
-            const button = event.target;
-            
-            // Валидация
-            if (field === 'name' && newValue.length < 2 && newValue.length > 0) {
-                alert('Имя должно содержать минимум 2 символа');
-                return;
-            }
-            
-            if (field === 'phone' && newValue) {
-                const digits = newValue.replace(/\D/g, '');
-                if (digits.length < 10) {
-                    alert('Телефон должен содержать 10-11 цифр');
-                    return;
-                }
-            }
-            
-            // Сохраняем данные
-            userData[field] = newValue;
-            saveUserData();
-            updateUI();
-            
-            // Показываем успех на кнопке
-            const originalText = button.textContent;
-            button.textContent = '✅ Готово!';
-            button.style.background = '#4CAF50';
-            
-            // Закрываем форму через 500 мс
-            setTimeout(() => {
-                const editForm = document.getElementById(`edit${capitalize(field)}`);
-                if (editForm) {
-                    editForm.classList.remove('active');
-                }
-                editingField = null;
-                
-                // Восстанавливаем кнопку
-                button.textContent = originalText;
-                button.style.background = '#FF8C00';
-            }, 500);
-        }
-
-        function logout() {
-            if (confirm('Очистить все данные?')) {
-                localStorage.removeItem('userProfile');
-                createNewUser();
-                updateUI();
-                alert('✅ Данные очищены');
-            }
-        }
-
-        // Для отладки - смотрим что в localStorage при загрузке
-        window.addEventListener('load', function() {
-            console.log('Все данные в localStorage:', localStorage);
-        });
     </script>
 </body>
 </html>
