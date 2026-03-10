@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Новый заказ - УНЧ</title>
+    
+    <!-- PWA мета-теги -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#FF8C00">
+    
+    <!-- Иконки -->
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    
+    <!-- Стили -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        /* Дополнительные стили для страницы заказа */
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin: 20px 0 30px;
+            position: relative;
+        }
+        
+        .step {
+            flex: 1;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .step-number {
+            width: 32px;
+            height: 32px;
+            background: var(--card);
+            border: 2px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+        }
+        
+        .step.active .step-number {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+        
+        .step.completed .step-number {
+            background: #4CAF50;
+            border-color: #4CAF50;
+            color: white;
+        }
+        
+        .step-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .step.active .step-label {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .step-line {
+            position: absolute;
+            top: 16px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--border);
+            z-index: 1;
+        }
+        
+        .step-line-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .step-content {
+            display: none;
+            animation: fadeIn 0.3s;
+        }
+        
+        .step-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .bags-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 20px 0;
+        }
+        
+        .bag-card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 24px 16px;
+            text-align: center;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        .bag-card.selected {
+            border-color: var(--primary);
+            background: rgba(255, 140, 0, 0.05);
+            transform: scale(1.02);
+        }
+        
+        .bag-count {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+        
+        .bag-price {
+            font-size: 20px;
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .bag-total {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        
+        .time-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0 15px;
+        }
+        
+        .time-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .date-badge {
+            background: rgba(255, 140, 0, 0.1);
+            color: var(--primary);
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .time-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        .time-slot {
+            background: var(--card);
+            padding: 16px 8px;
+            border-radius: 16px;
+            text-align: center;
+            font-weight: 600;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .time-slot.selected {
+            border-color: var(--primary);
+            background: rgba(255, 140, 0, 0.05);
+        }
+        
+        .time-slot.unavailable {
+            opacity: 0.5;
+            text-decoration: line-through;
+            cursor: not-allowed;
+            background: #f5f5f5;
+        }
+        
+        .time-slot.unavailable.selected {
+            border-color: #f44336;
+            background: rgba(244, 67, 54, 0.05);
+        }
+        
+        .order-summary {
+            background: rgba(255, 140, 0, 0.05);
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 140, 0, 0.2);
+        }
+        
+        .summary-row:last-child {
+            border-bottom: none;
+        }
+        
+        .summary-label {
+            color: var(--text-secondary);
+        }
+        
+        .summary-value {
+            font-weight: 600;
+        }
+        
+        .summary-total {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        .address-display {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .address-display .label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+        
+        .address-display .value {
+            font-size: 16px;
+            font-weight: 600;
+        }
+        
+        .nav-buttons {
+            display: flex;
+            gap: 12px;
+            margin: 20px 0 30px;
+        }
+        
+        .nav-button {
+            flex: 1;
+            padding: 16px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .nav-button.primary {
+            background: var(--primary);
+            color: white;
+            border: none;
+        }
+        
+        .nav-button.secondary {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .nav-button:active {
+            transform: scale(0.97);
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Шапка -->
+        <div class="header">
+            <div class="back-button" onclick="history.back()">←</div>
+            <div class="header-title">Новый заказ</div>
+            <div style="width: 40px;"></div>
+        </div>
+
+        <!-- Индикатор шагов -->
+        <div class="step-indicator">
+            <div class="step-line">
+                <div class="step-line-fill" id="stepLineFill"></div>
+            </div>
+            <div class="step active" id="step1">
+                <div class="step-number">1</div>
+                <div class="step-label">Адрес</div>
+            </div>
+            <div class="step" id="step2">
+                <div class="step-number">2</div>
+                <div class="step-label">Пакеты</div>
+            </div>
+            <div class="step" id="step3">
+                <div class="step-number">3</div>
+                <div class="step-label">Время</div>
+            </div>
+            <div class="step" id="step4">
+                <div class="step-number">4</div>
+                <div class="step-label">Итог</div>
+            </div>
+        </div>
+
+        <!-- ШАГ 1: Адрес -->
+        <div class="step-content active" id="step1Content">
+            <div class="form-group">
+                <label class="form-label">📍 Район</label>
+                <input class="form-input" type="text" id="district" value="мкр-н Светлый" readonly>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">📝 Адрес (дом, подъезд, этаж, квартира)</label>
+                <input class="form-input" type="text" id="address" 
+                       placeholder="12, 3, 4, 567"
+                       value="12, 3, 4, 567">
+                <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">
+                    Пример: 12, 3, 4, 567
+                </div>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="nav-button secondary" onclick="goToStep(1)">Отмена</button>
+                <button class="nav-button primary" onclick="nextStep()">Далее</button>
+            </div>
+        </div>
+
+        <!-- ШАГ 2: Количество пакетов -->
+        <div class="step-content" id="step2Content">
+            <div class="address-display" id="step2Address"></div>
+            
+            <div class="bags-grid">
+                <div class="bag-card" onclick="selectBags(1)">
+                    <div class="bag-count">1</div>
+                    <div class="bag-price">100₽</div>
+                    <div class="bag-total">100₽</div>
+                </div>
+                <div class="bag-card" onclick="selectBags(2)">
+                    <div class="bag-count">2</div>
+                    <div class="bag-price">125₽</div>
+                    <div class="bag-total">125₽</div>
+                </div>
+                <div class="bag-card" onclick="selectBags(3)">
+                    <div class="bag-count">3</div>
+                    <div class="bag-price">150₽</div>
+                    <div class="bag-total">150₽</div>
+                </div>
+                <div class="bag-card" onclick="selectBags(4)">
+                    <div class="bag-count">4</div>
+                    <div class="bag-price">175₽</div>
+                    <div class="bag-total">175₽</div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">✏️ Своё количество</label>
+                <input class="form-input" type="number" id="customBags" 
+                       placeholder="5-20 пакетов" min="5" max="20"
+                       onchange="selectCustomBags()">
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="nav-button secondary" onclick="prevStep()">Назад</button>
+                <button class="nav-button primary" onclick="nextStep()">Далее</button>
+            </div>
+        </div>
+
+        <!-- ШАГ 3: Выбор времени -->
+        <div class="step-content" id="step3Content">
+            <div class="address-display" id="step3Address"></div>
+            
+            <div class="time-header">
+                <h3>Сегодня</h3>
+                <span class="date-badge" id="todayDate"></span>
+            </div>
+            <div class="time-grid" id="todayTimes"></div>
+            
+            <div class="time-header">
+                <h3>Завтра</h3>
+                <span class="date-badge" id="tomorrowDate"></span>
+            </div>
+            <div class="time-grid" id="tomorrowTimes"></div>
+            
+            <div class="nav-buttons">
+                <button class="nav-button secondary" onclick="prevStep()">Назад</button>
+                <button class="nav-button primary" onclick="nextStep()">Далее</button>
+            </div>
+        </div>
+
+        <!-- ШАГ 4: Подтверждение -->
+        <div class="step-content" id="step4Content">
+            <div class="order-summary">
+                <div class="summary-row">
+                    <span class="summary-label">📍 Адрес</span>
+                    <span class="summary-value" id="confirmAddress"></span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">📦 Пакеты</span>
+                    <span class="summary-value" id="confirmBags"></span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">🕐 Время</span>
+                    <span class="summary-value" id="confirmTime"></span>
+                </div>
+                <div class="summary-total" id="confirmTotal"></div>
+            </div>
+            
+            <div style="background: rgba(255, 140, 0, 0.1); border-radius: 16px; padding: 16px; margin: 20px 0;">
+                <p style="font-weight: 600; margin-bottom: 10px;">📋 Важно:</p>
+                <ul style="font-size: 14px; color: var(--text-secondary); list-style: none; padding: 0;">
+                    <li style="margin-bottom: 8px;">• Будьте на связи в указанное время</li>
+                    <li style="margin-bottom: 8px;">• Оплата после выполнения</li>
+                    <li style="margin-bottom: 8px;">• Отмена — напишите @ваш_админ</li>
+                </ul>
+            </div>
+            
+            <div class="nav-buttons">
+                <button class="nav-button secondary" onclick="prevStep()">Назад</button>
+                <button class="nav-button primary" onclick="submitOrder()">✅ ПОДТВЕРДИТЬ</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Telegram WebApp -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- Скрипты -->
+    <script src="js/db.js"></script>
+    <script src="js/api.js"></script>
+    <script>
+        let currentStep = 1;
+        let selectedBags = 0;
+        let selectedTime = null;
+        let selectedTimestamp = 0;
+        let availableTimes = {today: [], tomorrow: []};
+        let userData = null;
+
+        // Инициализация Telegram
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.expand();
+            tg.ready();
+            tg.setHeaderColor('#FF8C00');
+            tg.setBackgroundColor('#f8f9fa');
+        }
+
+        // Загрузка данных при старте
+        document.addEventListener('DOMContentLoaded', async () => {
+            userData = await DB.getUser();
+            if (userData?.address) {
+                document.getElementById('address').value = userData.address;
+            }
+            
+            // Устанавливаем даты
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            document.getElementById('todayDate').textContent = today.toLocaleDateString('ru-RU', {day: 'numeric', month: 'long'});
+            document.getElementById('tomorrowDate').textContent = tomorrow.toLocaleDateString('ru-RU', {day: 'numeric', month: 'long'});
+            
+            // Загружаем доступное время
+            await loadAvailableTimes();
+        });
+
+        async function loadAvailableTimes() {
+            try {
+                const response = await fetch(`${API.baseUrl}/times`);
+                availableTimes = await response.json();
+                renderTimes();
+            } catch (error) {
+                console.error('Ошибка загрузки времени:', error);
+                // Тестовые данные
+                availableTimes = {
+                    today: [
+                        {time: '20:00', available: true},
+                        {time: '20:30', available: true},
+                        {time: '21:00', available: false},
+                        {time: '21:30', available: true},
+                        {time: '22:00', available: true},
+                        {time: '22:30', available: true}
+                    ],
+                    tomorrow: [
+                        {time: '20:00', available: true},
+                        {time: '20:30', available: true},
+                        {time: '21:00', available: true},
+                        {time: '21:30', available: true},
+                        {time: '22:00', available: true},
+                        {time: '22:30', available: true}
+                    ]
+                };
+                renderTimes();
+            }
+        }
+
+        function renderTimes() {
+            const todayContainer = document.getElementById('todayTimes');
+            const tomorrowContainer = document.getElementById('tomorrowTimes');
+            
+            todayContainer.innerHTML = '';
+            tomorrowContainer.innerHTML = '';
+            
+            availableTimes.today.forEach(slot => {
+                const btn = document.createElement('div');
+                btn.className = `time-slot ${slot.available ? '' : 'unavailable'}`;
+                btn.textContent = slot.time;
+                if (slot.available) {
+                    btn.onclick = () => selectTime(btn, slot.time, 'today');
+                }
+                todayContainer.appendChild(btn);
+            });
+            
+            availableTimes.tomorrow.forEach(slot => {
+                const btn = document.createElement('div');
+                btn.className = `time-slot ${slot.available ? '' : 'unavailable'}`;
+                btn.textContent = slot.time;
+                if (slot.available) {
+                    btn.onclick = () => selectTime(btn, slot.time, 'tomorrow');
+                }
+                tomorrowContainer.appendChild(btn);
+            });
+        }
+
+        function nextStep() {
+            if (currentStep === 1) {
+                const address = document.getElementById('address').value;
+                if (!address) {
+                    alert('Введите адрес');
+                    return;
+                }
+                document.getElementById('step2Address').innerHTML = `
+                    <div class="label">Адрес доставки</div>
+                    <div class="value">${address}</div>
+                `;
+                document.getElementById('step3Address').innerHTML = `
+                    <div class="label">Адрес доставки</div>
+                    <div class="value">${address}</div>
+                `;
+            }
+            
+            if (currentStep === 2) {
+                if (selectedBags === 0) {
+                    alert('Выберите количество пакетов');
+                    return;
+                }
+            }
+            
+            if (currentStep === 3) {
+                if (!selectedTime) {
+                    alert('Выберите время');
+                    return;
+                }
+                
+                // Обновляем подтверждение
+                const address = document.getElementById('address').value;
+                const price = selectedBags === 1 ? 100 : 100 + (selectedBags - 1) * 25;
+                
+                document.getElementById('confirmAddress').textContent = address.split(',')[0] + '...';
+                document.getElementById('confirmBags').textContent = `${selectedBags} пак. = ${price}₽`;
+                document.getElementById('confirmTime').textContent = selectedTime;
+                document.getElementById('confirmTotal').textContent = `Итого: ${price}₽`;
+            }
+            
+            // Обновляем шаг
+            document.querySelector(`.step-content.active`).classList.remove('active');
+            currentStep++;
+            document.getElementById(`step${currentStep}Content`).classList.add('active');
+            
+            // Обновляем индикатор
+            document.querySelectorAll('.step').forEach((step, index) => {
+                if (index + 1 < currentStep) {
+                    step.classList.add('completed');
+                    step.classList.remove('active');
+                } else if (index + 1 === currentStep) {
+                    step.classList.add('active');
+                    step.classList.remove('completed');
+                } else {
+                    step.classList.remove('active', 'completed');
+                }
+            });
+            
+            document.getElementById('stepLineFill').style.width = `${(currentStep - 1) * 33.33}%`;
+        }
+
+        function prevStep() {
+            document.querySelector(`.step-content.active`).classList.remove('active');
+            currentStep--;
+            document.getElementById(`step${currentStep}Content`).classList.add('active');
+            
+            document.querySelectorAll('.step').forEach((step, index) => {
+                if (index + 1 < currentStep) {
+                    step.classList.add('completed');
+                    step.classList.remove('active');
+                } else if (index + 1 === currentStep) {
+                    step.classList.add('active');
+                    step.classList.remove('completed');
+                } else {
+                    step.classList.remove('active', 'completed');
+                }
+            });
+            
+            document.getElementById('stepLineFill').style.width = `${(currentStep - 1) * 33.33}%`;
+        }
+
+        function goToStep(step) {
+            while (currentStep !== step) {
+                if (currentStep > step) {
+                    prevStep();
+                } else {
+                    nextStep();
+                }
+            }
+        }
+
+        function selectBags(count) {
+            selectedBags = count;
+            
+            document.querySelectorAll('.bag-card').forEach(el => {
+                el.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            
+            document.getElementById('customBags').value = '';
+        }
+
+        function selectCustomBags() {
+            const count = parseInt(document.getElementById('customBags').value);
+            if (count >= 5 && count <= 20) {
+                selectedBags = count;
+                
+                document.querySelectorAll('.bag-card').forEach(el => {
+                    el.classList.remove('selected');
+                });
+            }
+        }
+
+        function selectTime(element, time, day) {
+            document.querySelectorAll('.time-slot').forEach(el => {
+                el.classList.remove('selected');
+            });
+            element.classList.add('selected');
+            
+            const today = new Date();
+            if (day === 'tomorrow') {
+                today.setDate(today.getDate() + 1);
+            }
+            
+            const [hours, minutes] = time.split(':');
+            today.setHours(parseInt(hours), parseInt(minutes), 0, 0);
+            
+            selectedTime = `${day === 'today' ? 'Сегодня' : 'Завтра'} ${time}`;
+            selectedTimestamp = Math.floor(today.getTime() / 1000);
+        }
+
+        async function submitOrder() {
+            if (!userData) {
+                alert('Ошибка: пользователь не найден');
+                return;
+            }
+            
+            const address = document.getElementById('address').value;
+            const price = selectedBags === 1 ? 100 : 100 + (selectedBags - 1) * 25;
+            
+            const orderData = {
+                user_id: userData.user_id,
+                name: userData.name,
+                phone: userData.phone || 'не указан',
+                address: address,
+                username: userData.username,
+                short_id: userData.short_id,
+                exact_time: selectedTime,
+                bags: selectedBags,
+                amount: price
+            };
+            
+            try {
+                const result = await API.createOrder(orderData);
+                
+                if (result.status === 'ok') {
+                    alert(`✅ Заказ оформлен!\nНомер: ${result.order_number}`);
+                    
+                    // Сохраняем в локальную БД
+                    const orders = await DB.getOrders(userData.user_id) || [];
+                    orders.push({
+                        number: result.order_number,
+                        ...orderData,
+                        status: 'новый',
+                        payment: 'ожидает'
+                    });
+                    await DB.saveOrders(orders);
+                    
+                    // Возвращаемся на главную
+                    window.location.href = 'index.html';
+                }
+            } catch (error) {
+                console.error('Ошибка создания заказа:', error);
+                
+                // Сохраняем офлайн
+                await DB.addToSync({
+                    type: 'create_order',
+                    data: orderData
+                });
+                
+                alert('✅ Заказ сохранён офлайн. Будет отправлен при подключении к интернету');
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+</html>

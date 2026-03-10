@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Профиль - УНЧ</title>
+    
+    <!-- PWA мета-теги -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#FF8C00">
+    
+    <!-- Иконки -->
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    
+    <!-- Стили -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        .profile-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 40px 20px 30px;
+            text-align: center;
+            margin: -16px -16px 20px -16px;
+            border-bottom-left-radius: 30px;
+            border-bottom-right-radius: 30px;
+        }
+        
+        .profile-avatar-large {
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            margin: 0 auto 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .profile-name-large {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .profile-id-large {
+            font-size: 16px;
+            opacity: 0.9;
+            background: rgba(255,255,255,0.2);
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 30px;
+        }
+        
+        .profile-stats {
+            display: flex;
+            background: var(--card);
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        .stat-item {
+            flex: 1;
+            text-align: center;
+            position: relative;
+        }
+        
+        .stat-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 20%;
+            height: 60%;
+            width: 1px;
+            background: var(--border);
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .info-section {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .info-row {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+        }
+        
+        .info-row:last-child {
+            border-bottom: none;
+        }
+        
+        .info-icon {
+            width: 40px;
+            font-size: 24px;
+        }
+        
+        .info-content {
+            flex: 1;
+        }
+        
+        .info-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        
+        .info-value {
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        .info-arrow {
+            color: var(--text-secondary);
+            font-size: 20px;
+        }
+        
+        .edit-input {
+            display: none;
+            margin-top: 8px;
+        }
+        
+        .edit-input.active {
+            display: block;
+        }
+        
+        .save-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+        
+        .logout-button {
+            background: transparent;
+            color: #f44336;
+            border: 2px solid #f44336;
+            padding: 16px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            margin: 20px 0;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Шапка профиля -->
+        <div class="profile-header">
+            <div class="profile-avatar-large" id="profileAvatarLarge">👤</div>
+            <div class="profile-name-large" id="profileNameLarge">Загрузка...</div>
+            <div class="profile-id-large" id="profileIdLarge"></div>
+        </div>
+
+        <!-- Статистика -->
+        <div class="profile-stats">
+            <div class="stat-item">
+                <div class="stat-value" id="statOrders">0</div>
+                <div class="stat-label">Заказов</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="statCompleted">0</div>
+                <div class="stat-label">Выполнено</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="statRating">0</div>
+                <div class="stat-label">Рейтинг</div>
+            </div>
+        </div>
+
+        <!-- Личные данные -->
+        <div class="info-section">
+            <div class="section-title">
+                <span>📋 Личные данные</span>
+            </div>
+            
+            <div class="info-row" onclick="editField('name')">
+                <div class="info-icon">👤</div>
+                <div class="info-content">
+                    <div class="info-label">Имя</div>
+                    <div class="info-value" id="displayName">—</div>
+                </div>
+                <div class="info-arrow">✏️</div>
+            </div>
+            <div class="edit-input" id="editName">
+                <input type="text" class="form-input" id="inputName" placeholder="Введите имя">
+                <button class="save-button" onclick="saveField('name')">Сохранить</button>
+            </div>
+            
+            <div class="info-row" onclick="editField('phone')">
+                <div class="info-icon">📱</div>
+                <div class="info-content">
+                    <div class="info-label">Телефон</div>
+                    <div class="info-value" id="displayPhone">—</div>
+                </div>
+                <div class="info-arrow">✏️</div>
+            </div>
+            <div class="edit-input" id="editPhone">
+                <input type="tel" class="form-input" id="inputPhone" placeholder="+7 (999) 123-45-67">
+                <button class="save-button" onclick="saveField('phone')">Сохранить</button>
+            </div>
+            
+            <div class="info-row" onclick="editField('address')">
+                <div class="info-icon">📍</div>
+                <div class="info-content">
+                    <div class="info-label">Адрес</div>
+                    <div class="info-value" id="displayAddress">—</div>
+                </div>
+                <div class="info-arrow">✏️</div>
+            </div>
+            <div class="edit-input" id="editAddress">
+                <input type="text" class="form-input" id="inputAddress" placeholder="12, 3, 4, 567">
+                <div style="font-size: 12px; color: var(--text-secondary); margin: 5px 0;">дом, подъезд, этаж, квартира</div>
+                <button class="save-button" onclick="saveField('address')">Сохранить</button>
+            </div>
+        </div>
+
+        <!-- Информация о сервисе -->
+        <div class="info-section">
+            <div class="section-title">
+                <span>ℹ️ О сервисе</span>
+            </div>
+            
+            <div class="info-row" onclick="window.location.href='reviews.html'">
+                <div class="info-icon">⭐</div>
+                <div class="info-content">
+                    <div class="info-label">Отзывы</div>
+                    <div class="info-value">Посмотреть отзывы клиентов</div>
+                </div>
+                <div class="info-arrow">→</div>
+            </div>
+            
+            <div class="info-row" onclick="openSupport()">
+                <div class="info-icon">📞</div>
+                <div class="info-content">
+                    <div class="info-label">Поддержка</div>
+                    <div class="info-value">@ваш_админ</div>
+                </div>
+                <div class="info-arrow">→</div>
+            </div>
+            
+            <div class="info-row" onclick="openRules()">
+                <div class="info-icon">📋</div>
+                <div class="info-content">
+                    <div class="info-label">Правила</div>
+                    <div class="info-value">Как работает сервис</div>
+                </div>
+                <div class="info-arrow">→</div>
+            </div>
+        </div>
+
+        <!-- Кнопка выхода (очистка данных) -->
+        <button class="logout-button" onclick="logout()">
+            🚪 Выйти (очистить данные)
+        </button>
+    </div>
+
+    <!-- Нижняя навигация -->
+    <div class="bottom-nav">
+        <div class="nav-item" onclick="window.location.href='index.html'">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-text">Главная</span>
+        </div>
+        <div class="nav-item" onclick="window.location.href='orders.html'">
+            <span class="nav-icon">📋</span>
+            <span class="nav-text">Заказы</span>
+        </div>
+        <div class="nav-item active" onclick="window.location.href='profile.html'">
+            <span class="nav-icon">👤</span>
+            <span class="nav-text">Профиль</span>
+        </div>
+    </div>
+
+    <!-- Telegram WebApp -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- Скрипты -->
+    <script src="js/db.js"></script>
+    <script src="js/api.js"></script>
+    <script>
+        let userData = null;
+        let editingField = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            userData = await DB.getUser();
+            await loadStats();
+            updateUI();
+        });
+
+        function updateUI() {
+            if (!userData) return;
+            
+            // Обновляем шапку
+            document.getElementById('profileNameLarge').textContent = userData.name || 'Пользователь';
+            document.getElementById('profileIdLarge').textContent = userData.short_id ? `ID: ${userData.short_id}` : '';
+            
+            // Инициалы для аватара
+            if (userData.name) {
+                const initials = userData.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                document.getElementById('profileAvatarLarge').textContent = initials;
+            }
+            
+            // Обновляем поля
+            document.getElementById('displayName').textContent = userData.name || 'Не указано';
+            document.getElementById('displayPhone').textContent = userData.phone || 'Не указано';
+            document.getElementById('displayAddress').textContent = userData.address || 'Не указано';
+            
+            // Заполняем поля ввода
+            document.getElementById('inputName').value = userData.name || '';
+            document.getElementById('inputPhone').value = userData.phone || '';
+            document.getElementById('inputAddress').value = userData.address || '';
+        }
+
+        async function loadStats() {
+            if (!userData) return;
+            
+            try {
+                const orders = await API.getOrders(userData.user_id) || [];
+                const completed = orders.filter(o => o.status === 'выполнен').length;
+                
+                document.getElementById('statOrders').textContent = orders.length;
+                document.getElementById('statCompleted').textContent = completed;
+                
+                // Рейтинг из отзывов
+                const reviews = await API.getReviews();
+                const userReviews = reviews.filter(r => r.short_id === userData.short_id);
+                if (userReviews.length > 0) {
+                    const avg = userReviews.reduce((sum, r) => sum + r.rating, 0) / userReviews.length;
+                    document.getElementById('statRating').textContent = avg.toFixed(1);
+                } else {
+                    document.getElementById('statRating').textContent = '5.0';
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки статистики:', error);
+            }
+        }
+
+        function editField(field) {
+            if (editingField) {
+                document.getElementById(`edit${capitalize(editingField)}`).classList.remove('active');
+            }
+            
+            editingField = field;
+            document.getElementById(`edit${capitalize(field)}`).classList.add('active');
+        }
+
+        function capitalize(str) {
+            return str.charAt(0).toUpperCase() + str.slice(1);
+        }
+
+        async function saveField(field) {
+            const input = document.getElementById(`input${capitalize(field)}`);
+            const newValue = input.value.trim();
+            
+            if (!newValue && field !== 'phone') {
+                alert('Поле не может быть пустым');
+                return;
+            }
+            
+            // Обновляем локально
+            userData[field] = newValue;
+            await DB.saveUser(userData);
+            
+            // Обновляем на сервере
+            try {
+                await API.updateUser(userData.user_id, {
+                    [field]: newValue
+                });
+            } catch (error) {
+                // Офлайн - сохраняем для синхронизации
+                await DB.addToSync({
+                    type: 'update_user',
+                    user_id: userData.user_id,
+                    data: {[field]: newValue}
+                });
+            }
+            
+            // Закрываем редактирование
+            document.getElementById(`edit${capitalize(field)}`).classList.remove('active');
+            editingField = null;
+            
+            // Обновляем отображение
+            updateUI();
+        }
+
+        function openSupport() {
+            const tg = window.Telegram?.WebApp;
+            if (tg) {
+                tg.openTelegramLink('https://t.me/ваш_админ');
+            } else {
+                window.open('https://t.me/ваш_админ', '_blank');
+            }
+        }
+
+        function openRules() {
+            alert('📋 Правила сервиса:\n\n• Заказы принимаются за 10 минут до времени\n• Минимальное время на подготовку - 10 минут\n• Отмена заказа - @ваш_админ\n• Оплата после выполнения');
+        }
+
+        async function logout() {
+            if (confirm('Очистить все данные?')) {
+                await DB.saveUser(null);
+                window.location.href = 'index.html';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Мои заказы - УНЧ</title>
+    
+    <!-- PWA мета-теги -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#FF8C00">
+    
+    <!-- Иконки -->
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    
+    <!-- Стили -->
+    <link rel="stylesheet" href="css/style.css">
+    
+    <style>
+        .orders-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 20px 0 80px;
+        }
+        
+        .order-card {
+            background: var(--card);
+            border-radius: 20px;
+            padding: 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.2s;
+            border-left: 4px solid transparent;
+        }
+        
+        .order-card.new {
+            border-left-color: var(--primary);
+        }
+        
+        .order-card.completed {
+            border-left-color: #4CAF50;
+        }
+        
+        .order-card.cancelled {
+            border-left-color: #f44336;
+            opacity: 0.8;
+        }
+        
+        .order-card:active {
+            transform: scale(0.99);
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        
+        .order-number {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .order-status {
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .status-new {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .status-completed {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .status-cancelled {
+            background: #f44336;
+            color: white;
+        }
+        
+        .order-details {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        
+        .order-detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        
+        .order-detail-label {
+            color: var(--text-secondary);
+        }
+        
+        .order-detail-value {
+            font-weight: 600;
+        }
+        
+        .order-price {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+            text-align: right;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .order-review {
+            margin-top: 10px;
+            padding: 10px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 12px;
+            font-size: 13px;
+        }
+        
+        .review-stars {
+            color: #FFD700;
+            margin-bottom: 4px;
+        }
+        
+        .review-text {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+        
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            margin: 20px 0;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .filter-tab {
+            padding: 8px 20px;
+            background: var(--card);
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            border: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .filter-tab.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .filter-tab:active {
+            transform: scale(0.95);
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Шапка -->
+        <div class="header">
+            <div class="back-button" onclick="history.back()">←</div>
+            <div class="header-title">Мои заказы</div>
+            <div style="width: 40px;"></div>
+        </div>
+
+        <!-- Фильтры -->
+        <div class="filter-tabs">
+            <div class="filter-tab active" onclick="filterOrders('all')">Все</div>
+            <div class="filter-tab" onclick="filterOrders('new')">Новые</div>
+            <div class="filter-tab" onclick="filterOrders('completed')">Выполненные</div>
+            <div class="filter-tab" onclick="filterOrders('cancelled')">Отменённые</div>
+        </div>
+
+        <!-- Список заказов -->
+        <div id="ordersList" class="orders-list">
+            <div class="loading">Загрузка...</div>
+        </div>
+    </div>
+
+    <!-- Нижняя навигация -->
+    <div class="bottom-nav">
+        <div class="nav-item" onclick="window.location.href='index.html'">
+            <span class="nav-icon">🏠</span>
+            <span class="nav-text">Главная</span>
+        </div>
+        <div class="nav-item active" onclick="window.location.href='orders.html'">
+            <span class="nav-icon">📋</span>
+            <span class="nav-text">Заказы</span>
+        </div>
+        <div class="nav-item" onclick="window.location.href='profile.html'">
+            <span class="nav-icon">👤</span>
+            <span class="nav-text">Профиль</span>
+        </div>
+    </div>
+
+    <!-- Telegram WebApp -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- Скрипты -->
+    <script src="js/db.js"></script>
+    <script src="js/api.js"></script>
+    <script>
+        let allOrders = [];
+        let currentFilter = 'all';
+        let userData = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            userData = await DB.getUser();
+            await loadOrders();
+        });
+
+        async function loadOrders() {
+            const container = document.getElementById('ordersList');
+            
+            if (!userData) {
+                container.innerHTML = '<div class="empty-state"><div class="empty-icon">👤</div><div>Сначала заполните профиль</div></div>';
+                return;
+            }
+            
+            try {
+                // Пробуем загрузить с сервера
+                const orders = await API.getOrders(userData.user_id);
+                if (orders && orders.length > 0) {
+                    allOrders = orders;
+                    await DB.saveOrders(orders);
+                } else {
+                    // Если нет, берём из кэша
+                    allOrders = await DB.getOrders(userData.user_id) || [];
+                }
+            } catch (error) {
+                // Офлайн - берём из кэша
+                allOrders = await DB.getOrders(userData.user_id) || [];
+            }
+            
+            displayOrders();
+        }
+
+        function displayOrders() {
+            const container = document.getElementById('ordersList');
+            
+            if (allOrders.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📭</div>
+                        <div style="font-size: 18px; font-weight: 600; margin-bottom: 10px;">Нет заказов</div>
+                        <div style="margin-bottom: 20px;">Нажмите кнопку ниже, чтобы сделать первый заказ</div>
+                        <button class="button-primary" style="width: auto; padding: 12px 30px;" onclick="window.location.href='order.html'">
+                            🗑️ Заказать
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            let filtered = allOrders;
+            if (currentFilter === 'new') {
+                filtered = allOrders.filter(o => o.status === 'новый');
+            } else if (currentFilter === 'completed') {
+                filtered = allOrders.filter(o => o.status === 'выполнен');
+            } else if (currentFilter === 'cancelled') {
+                filtered = allOrders.filter(o => o.status === 'отменен');
+            }
+            
+            if (filtered.length === 0) {
+                container.innerHTML = `<div class="empty-state">Нет заказов в этой категории</div>`;
+                return;
+            }
+            
+            let html = '';
+            filtered.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+            
+            filtered.forEach(order => {
+                const statusClass = order.status === 'новый' ? 'status-new' : 
+                                   order.status === 'выполнен' ? 'status-completed' : 'status-cancelled';
+                
+                const statusText = order.status === 'новый' ? '🆕 Новый' :
+                                  order.status === 'выполнен' ? '✅ Выполнен' : '❌ Отменён';
+                
+                const date = order.exact_time || 'Дата не указана';
+                
+                html += `
+                    <div class="order-card ${order.status}" onclick="viewOrder('${order.number}')">
+                        <div class="order-header">
+                            <span class="order-number">🎫 ${order.number}</span>
+                            <span class="order-status ${statusClass}">${statusText}</span>
+                        </div>
+                        <div class="order-details">
+                            <div class="order-detail-row">
+                                <span class="order-detail-label">🕐 Время:</span>
+                                <span class="order-detail-value">${date}</span>
+                            </div>
+                            <div class="order-detail-row">
+                                <span class="order-detail-label">📍 Адрес:</span>
+                                <span class="order-detail-value">${order.address?.split(',')[0] || '—'}</span>
+                            </div>
+                            <div class="order-detail-row">
+                                <span class="order-detail-label">📦 Пакеты:</span>
+                                <span class="order-detail-value">${order.bags} шт.</span>
+                            </div>
+                        </div>
+                        <div class="order-price">
+                            ${order.amount}₽
+                            ${order.payment === 'оплачен' ? '💰' : '⏳'}
+                        </div>
+                `;
+                
+                if (order.reviewed) {
+                    html += `
+                        <div class="order-review">
+                            <div class="review-stars">⭐⭐⭐⭐⭐</div>
+                            <div class="review-text">Спасибо за отзыв!</div>
+                        </div>
+                    `;
+                }
+                
+                html += `</div>`;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        function filterOrders(filter) {
+            currentFilter = filter;
+            
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            displayOrders();
+        }
+
+        function viewOrder(orderNumber) {
+            // Здесь можно открыть детали заказа
+            console.log('Просмотр заказа:', orderNumber);
+            alert(`Заказ ${orderNumber}\nДетали заказа появятся в следующей версии`);
+        }
+    </script>
+</body>
+</html>

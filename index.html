@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>УНЧ - У Нас Чисто</title>
+    
+    <!-- PWA мета-теги -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="УНЧ">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#FF8C00">
+    
+    <!-- Иконки -->
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+    
+    <!-- Манифест -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Стили -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app">
+        <!-- Шапка -->
+        <div class="header">
+            <div class="header-title">🚮 УНЧ</div>
+            <div class="header-close" onclick="Telegram?.WebApp?.close()">✕</div>
+        </div>
+
+        <!-- Профиль -->
+        <div class="profile-card" id="profileCard" onclick="goToProfile()">
+            <div class="profile-avatar" id="profileAvatar">👤</div>
+            <div class="profile-info">
+                <div class="profile-name" id="profileName">Загрузка...</div>
+                <div class="profile-phone" id="profilePhone"></div>
+            </div>
+            <div class="profile-arrow">›</div>
+        </div>
+
+        <!-- Баланс/статус -->
+        <div class="balance-card">
+            <div class="balance-item">
+                <div class="balance-label">Заказов</div>
+                <div class="balance-value" id="ordersCount">0</div>
+            </div>
+            <div class="balance-item">
+                <div class="balance-label">Отзывов</div>
+                <div class="balance-value" id="reviewsCount">0</div>
+            </div>
+            <div class="balance-item">
+                <div class="balance-label">Рейтинг</div>
+                <div class="balance-value" id="userRating">5.0</div>
+            </div>
+        </div>
+
+        <!-- Главная кнопка -->
+        <button class="main-button" onclick="window.location.href='order.html'">
+            <span class="main-button-icon">🗑️</span>
+            ЗАКАЗАТЬ ВЫНОС
+        </button>
+
+        <!-- Меню -->
+        <div class="menu-grid">
+            <div class="menu-item" onclick="window.location.href='orders.html'">
+                <span class="menu-icon">📋</span>
+                <span class="menu-text">Мои заказы</span>
+                <span class="menu-badge" id="activeOrdersBadge"></span>
+            </div>
+            <div class="menu-item" onclick="window.location.href='reviews.html'">
+                <span class="menu-icon">⭐</span>
+                <span class="menu-text">Отзывы</span>
+                <span class="menu-rating" id="averageRating">4.9</span>
+            </div>
+            <div class="menu-item" onclick="window.location.href='profile.html'">
+                <span class="menu-icon">⚙️</span>
+                <span class="menu-text">Настройки</span>
+            </div>
+        </div>
+
+        <!-- Информация о работе -->
+        <div class="info-card">
+            <div class="info-row">
+                <span>💰 1 пакет</span>
+                <span class="info-price">100₽</span>
+            </div>
+            <div class="info-row">
+                <span>📦 2+ пакета</span>
+                <span class="info-price">+25₽ за каждый</span>
+            </div>
+            <div class="info-row">
+                <span>⏰ Будни</span>
+                <span>20:00 - 23:30</span>
+            </div>
+            <div class="info-row">
+                <span>⏰ Выходные</span>
+                <span>19:00 - 01:00</span>
+            </div>
+        </div>
+
+        <!-- Нижняя навигация -->
+        <div class="bottom-nav">
+            <div class="nav-item active" onclick="window.location.href='index.html'">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-text">Главная</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='orders.html'">
+                <span class="nav-icon">📋</span>
+                <span class="nav-text">Заказы</span>
+            </div>
+            <div class="nav-item" onclick="window.location.href='profile.html'">
+                <span class="nav-icon">👤</span>
+                <span class="nav-text">Профиль</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Баннер установки PWA -->
+    <div id="installBanner" class="install-banner" style="display: none;">
+        <div class="install-icon">🗑️</div>
+        <div class="install-text">
+            <div class="install-title">Установить УНЧ</div>
+            <div class="install-subtitle">Быстрый доступ с рабочего стола</div>
+        </div>
+        <button class="install-button" onclick="installPWA()">Установить</button>
+    </div>
+
+    <!-- Telegram WebApp -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- Скрипты -->
+    <script src="js/db.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
+    
+    <!-- Регистрация Service Worker -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js');
+            });
+        }
+    </script>
+</body>
+</html>
