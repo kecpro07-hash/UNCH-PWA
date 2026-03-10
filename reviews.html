@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отзывы - У Нас Чисто</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            
+            /* Ваша картинка */
+            background: url('унч.png') no-repeat center center fixed;
+            background-size: cover;
+            
+            position: relative;
+            min-height: 100vh;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        /* Полупрозрачный слой поверх картинки */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 0;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .header p {
+            font-size: 16px;
+            opacity: 0.95;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        .stats {
+            background: rgba(255,255,255,0.15);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            color: white;
+            display: flex;
+            justify-content: space-around;
+            backdrop-filter: blur(5px);
+            flex-wrap: wrap;
+            gap: 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .stat-item {
+            text-align: center;
+            min-width: 100px;
+        }
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .reviews-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .review-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        .review-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+            background: rgba(255, 255, 255, 1);
+        }
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .order-info {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        /* ОРАНЖЕВЫЙ СТИЛЬ ДЛЯ ОБЕИХ ПЛАШЕК */
+        .order-number, .customer-id {
+            background: linear-gradient(135deg, #FF8C00 0%, #FF4500 100%);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            /* Одинаковый шрифт для обеих плашек */
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        /* Убираем моноширинный шрифт у ID */
+        .customer-id {
+            font-family: inherit; /* Наследует шрифт от родителя */
+        }
+        
+        .review-date {
+            color: #999;  /* Сделал светлее */
+            font-size: 13px;
+        }
+        .review-text {
+            font-size: 16px;
+            line-height: 1.6;
+            color: #333;
+            margin-bottom: 15px;
+            word-break: break-word;
+        }
+        .no-text {
+            color: #999;  /* Сделал светлее */
+            font-style: italic;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+        .rating {
+            display: flex;
+            gap: 5px;
+        }
+        .star {
+            color: #FFD700;
+            font-size: 20px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .star.inactive {
+            color: #ddd;
+            text-shadow: none;
+        }
+        .loading {
+            text-align: center;
+            color: white;
+            padding: 40px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .error {
+            background: rgba(255, 68, 68, 0.9);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+        .last-updated {
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+            font-size: 12px;
+            margin-top: 20px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⭐ Отзывы наших клиентов</h1>
+            <p>У Нас Чисто - сервис выноса мусора</p>
+        </div>
+        <div id="reviews-container">
+            <div class="loading">
+                <div class="loading-spinner"></div>
+                <p>Загрузка отзывов...</p>
+            </div>
+        </div>
+        <div id="last-updated" class="last-updated"></div>
+    </div>
+
+    <script>
+        async function loadReviews() {
+            try {
+                const response = await fetch('reviews.json?t=' + Date.now());
+                
+                if (!response.ok) {
+                    throw new Error('Ошибка загрузки: ' + response.status);
+                }
+                
+                const data = await response.json();
+                
+                let html = '';
+                let lastUpdated = '';
+                
+                if (data.last_updated) {
+                    lastUpdated = `Последнее обновление: ${data.last_updated}`;
+                }
+                
+                if (data.reviews && data.reviews.length > 0) {
+                    // Статистика
+                    html += `
+                        <div class="stats">
+                            <div class="stat-item">
+                                <div class="stat-value">${data.stats.total}</div>
+                                <div class="stat-label">всего отзывов</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${data.stats.average}</div>
+                                <div class="stat-label">средний рейтинг</div>
+                            </div>
+                        </div>
+                        <div class="reviews-list">
+                    `;
+                    
+                    data.reviews.forEach(review => {
+                        // Генерация звезд (просто звезды, без цифры 5)
+                        let stars = '';
+                        for (let i = 1; i <= 5; i++) {
+                            stars += i <= review.rating ? '<span class="star">★</span>' : '<span class="star inactive">☆</span>';
+                        }
+                        
+                        // Определяем отображение заказа
+                        const orderDisplay = review.order_number !== "GENERAL" ? 
+                            `Заказ ${review.order_number}` : 
+                            'Отзыв';
+                        
+                        // ID покупателя - ПОЛНЫЙ, без звездочек
+                        const customerId = review.short_id || 'НЕТ ID';
+                        
+                        // Проверяем наличие текста
+                        const hasText = review.text && review.text.trim() !== '' && review.text !== 'Без текстового отзыва';
+                        
+                        html += `
+                            <div class="review-card">
+                                <div class="review-header">
+                                    <div class="order-info">
+                                        <span class="order-number">${orderDisplay}</span>
+                                        <span class="customer-id">ID ${customerId}</span>
+                                    </div>
+                                    <span class="review-date">${review.date}</span>
+                                </div>
+                                ${hasText ? 
+                                    `<div class="review-text">${review.text}</div>` : 
+                                    `<div class="no-text"> </div>`
+                                }
+                                <div class="rating">${stars}</div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += '</div>';
+                } else {
+                    html = '<div class="loading">📭 Пока нет отзывов</div>';
+                }
+                
+                document.getElementById('reviews-container').innerHTML = html;
+                document.getElementById('last-updated').innerHTML = lastUpdated;
+                
+            } catch (error) {
+                console.error('Ошибка:', error);
+                document.getElementById('reviews-container').innerHTML = `
+                    <div class="error">
+                        <p>❌ Ошибка загрузки отзывов</p>
+                        <p style="font-size: 14px; margin-top: 10px;">Попробуйте обновить страницу</p>
+                    </div>
+                `;
+                document.getElementById('last-updated').innerHTML = '';
+            }
+        }
+        
+        // Загружаем отзывы при открытии
+        loadReviews();
+        
+        // Обновляем каждые 30 секунд
+        setInterval(loadReviews, 30000);
+        
+        // Telegram WebApp интеграция
+        const tg = window.Telegram?.WebApp;
+        if (tg) {
+            tg.expand();
+            tg.ready();
+            tg.setHeaderColor('#FF8C00');
+            tg.setBackgroundColor('#FF8C00');
+            
+            const backButton = tg.BackButton;
+            backButton.show();
+            backButton.onClick(function() {
+                tg.close();
+            });
+        }
+    </script>
+</body>
+</html>
