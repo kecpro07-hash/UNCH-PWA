@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Профиль - УНЧ</title>
+    
+    <!-- Мета-теги для iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="УНЧ">
+    
     <style>
         * {
             margin: 0;
@@ -274,25 +280,20 @@
         let userData = null;
         let editingField = null;
 
-        // Загрузка при старте
         document.addEventListener('DOMContentLoaded', function() {
             loadUserData();
         });
 
         function loadUserData() {
             const saved = localStorage.getItem('userProfile');
-            console.log('Загружаем из localStorage:', saved);
             
             if (saved) {
                 try {
                     userData = JSON.parse(saved);
-                    console.log('Данные пользователя:', userData);
                 } catch (e) {
-                    console.error('Ошибка парсинга:', e);
                     createNewUser();
                 }
             } else {
-                console.log('Нет данных, создаем нового');
                 createNewUser();
             }
             
@@ -320,17 +321,14 @@
 
         function saveUserData() {
             localStorage.setItem('userProfile', JSON.stringify(userData));
-            console.log('Сохранено в localStorage:', userData);
         }
 
         function updateUI() {
             if (!userData) return;
             
-            // Обновляем шапку
             document.getElementById('displayName').textContent = userData.name || 'Пользователь';
             document.getElementById('displayId').textContent = userData.short_id ? `ID: ${userData.short_id}` : '';
             
-            // Аватар
             if (userData.name) {
                 const words = userData.name.split(' ');
                 let initials = '';
@@ -340,12 +338,10 @@
                 document.getElementById('avatar').textContent = initials || '👤';
             }
             
-            // Обновляем поля
             document.getElementById('nameValue').textContent = userData.name || '—';
             document.getElementById('phoneValue').textContent = userData.phone || '—';
             document.getElementById('addressValue').textContent = userData.address || '—';
             
-            // Заполняем поля ввода
             document.getElementById('inputName').value = userData.name || '';
             document.getElementById('inputPhone').value = userData.phone || '';
             document.getElementById('inputAddress').value = userData.address || '';
@@ -368,30 +364,18 @@
             const input = document.getElementById(`input${capitalize(field)}`);
             const newValue = input.value.trim();
             
-            // Валидация
             if (field === 'name' && newValue.length < 2 && newValue.length > 0) {
                 alert('Имя должно содержать минимум 2 символа');
                 return;
             }
             
-            if (field === 'phone' && newValue) {
-                const digits = newValue.replace(/\D/g, '');
-                if (digits.length < 10) {
-                    alert('Телефон должен содержать 10-11 цифр');
-                    return;
-                }
-            }
-            
-            // Сохраняем
             userData[field] = newValue;
             saveUserData();
             updateUI();
             
-            // Закрываем форму
             document.getElementById(`edit${capitalize(field)}`).classList.remove('active');
             editingField = null;
             
-            // Показываем сообщение
             alert('✅ Сохранено!');
         }
 
@@ -403,25 +387,6 @@
                 alert('✅ Данные очищены');
             }
         }
-
-        // Форматирование телефона (опционально)
-        document.getElementById('inputPhone').addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 0) {
-                if (value.length <= 1) {
-                    value = '+7';
-                } else if (value.length <= 4) {
-                    value = '+7 (' + value.slice(1, 4);
-                } else if (value.length <= 7) {
-                    value = '+7 (' + value.slice(1, 4) + ') ' + value.slice(4, 7);
-                } else if (value.length <= 9) {
-                    value = '+7 (' + value.slice(1, 4) + ') ' + value.slice(4, 7) + '-' + value.slice(7, 9);
-                } else {
-                    value = '+7 (' + value.slice(1, 4) + ') ' + value.slice(4, 7) + '-' + value.slice(7, 9) + '-' + value.slice(9, 11);
-                }
-                e.target.value = value;
-            }
-        });
     </script>
 </body>
 </html>
