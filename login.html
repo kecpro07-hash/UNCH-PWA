@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Вход - УНЧ</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="УНЧ">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #FF8C00, #FF4500);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: white;
+            border-radius: 30px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo h1 {
+            font-size: 36px;
+            background: linear-gradient(135deg, #FF8C00, #FF4500);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .logo p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: #f5f5f5;
+            padding: 5px;
+            border-radius: 15px;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .tab.active {
+            background: white;
+            color: #FF8C00;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px;
+            border: 2px solid #eee;
+            border-radius: 16px;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #FF8C00;
+            box-shadow: 0 0 0 4px rgba(255,140,0,0.1);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-bottom: 15px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #FF8C00, #FF4500);
+            color: white;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid #FF8C00;
+            color: #FF8C00;
+        }
+
+        .info-box {
+            background: #f0f8ff;
+            border-radius: 16px;
+            padding: 20px;
+            margin: 20px 0;
+            font-size: 14px;
+            border-left: 4px solid #FF8C00;
+        }
+
+        .info-box p {
+            margin-bottom: 10px;
+        }
+
+        .info-box strong {
+            color: #FF8C00;
+        }
+
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        .otp-container {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 30px 0 20px;
+        }
+
+        .otp-input {
+            width: 50px;
+            height: 60px;
+            border: 2px solid #eee;
+            border-radius: 12px;
+            font-size: 24px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .otp-input:focus {
+            outline: none;
+            border-color: #FF8C00;
+        }
+
+        .timer {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin: 20px 0;
+        }
+
+        .resend-link {
+            text-align: center;
+            color: #FF8C00;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #666;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .back-link:hover {
+            color: #FF8C00;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: calc(50% - 70px);
+            height: 1px;
+            background: #eee;
+        }
+
+        .divider::before { left: 0; }
+        .divider::after { right: 0; }
+        .divider span {
+            background: white;
+            padding: 0 15px;
+            color: #999;
+            font-size: 14px;
+        }
+
+        .success-message {
+            background: #4CAF50;
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .test-button {
+            background: #f0f0f0;
+            color: #333;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="back-link" onclick="goBack()">← Назад</div>
+        
+        <div class="logo">
+            <h1>🚮 УНЧ</h1>
+            <p>Вход в личный кабинет</p>
+        </div>
+
+        <!-- Индикатор подключения к БД -->
+        <div id="dbStatus" style="text-align: center; margin-bottom: 10px; font-size: 12px;">
+            ⏳ Проверка подключения к базе данных...
+        </div>
+
+        <!-- Вкладки -->
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('phone')" id="tabPhone">📱 По телефону</div>
+            <div class="tab" onclick="switchTab('id')" id="tabId">🆔 По ID</div>
+        </div>
+
+        <!-- ШАГ 1: Вход по телефону -->
+        <div id="phoneStep1" class="step active">
+            <div class="info-box">
+                <p>📌 <strong>Уже пользовались ботом?</strong></p>
+                <p>Введите номер телефона, который вы указывали при заказах.</p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Номер телефона</label>
+                <input type="tel" class="form-input" id="phoneInput" placeholder="+7 (999) 123-45-67" oninput="formatPhone(this)">
+            </div>
+
+            <button class="btn btn-primary" onclick="sendPhoneCode()">Отправить код</button>
+            
+            <div class="divider">
+                <span>или</span>
+            </div>
+
+            <button class="btn btn-secondary" onclick="switchTab('id')">Войти по ID</button>
+        </div>
+
+        <!-- ШАГ 2: Ввод SMS-кода -->
+        <div id="phoneStep2" class="step">
+            <div class="info-box" id="phoneDisplay">
+                Код отправлен на номер<br>
+                <strong id="sentPhone"></strong>
+            </div>
+
+            <div class="otp-container">
+                <input type="text" class="otp-input" maxlength="1" onkeyup="moveToNext(this, 1)" id="otp1">
+                <input type="text" class="otp-input" maxlength="1" onkeyup="moveToNext(this, 2)" id="otp2">
+                <input type="text" class="otp-input" maxlength="1" onkeyup="moveToNext(this, 3)" id="otp3">
+                <input type="text" class="otp-input" maxlength="1" onkeyup="moveToNext(this, 4)" id="otp4">
+            </div>
+            
+            <div class="timer" id="timer">02:00</div>
+            <div class="resend-link" id="resendLink" onclick="resendCode()">Отправить повторно</div>
+            
+            <button class="btn btn-primary" onclick="verifyPhoneCode()">Подтвердить</button>
+            <button class="btn btn-secondary" onclick="backToPhoneStep1()">Изменить номер</button>
+        </div>
+
+        <!-- Вход по ID -->
+        <div id="idLogin" class="step">
+            <div class="info-box">
+                <p>📌 <strong>Вход по ID из Telegram бота</strong></p>
+                <p>1️⃣ Ваш ID указан в боте: <code>🆔 ABC1</code><br>
+                2️⃣ Отправьте боту: <code>/login ABC1</code><br>
+                3️⃣ Получите 6-значный код</p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Ваш ID</label>
+                <input type="text" class="form-input" id="idInput" placeholder="ABC1" oninput="this.value = this.value.toUpperCase()">
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Код из Telegram</label>
+                <input type="text" class="form-input" id="codeInput" placeholder="123456">
+            </div>
+
+            <button class="btn btn-primary" onclick="verifyIdCode()">Войти</button>
+            <button class="btn btn-secondary" onclick="switchTab('phone')">Назад</button>
+        </div>
+
+        <!-- Тестовая кнопка (для отладки) -->
+        <button class="test-button" onclick="testConnection()">🔄 Проверить подключение к БД</button>
+    </div>
+
+    <!-- Подключаем модули -->
+    <script type="importmap">
+        {
+            "imports": {
+                "@neondatabase/serverless": "https://esm.sh/@neondatabase/serverless"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import DBService from './js/db-service.js';
+
+        let timerInterval;
+        let timeLeft = 120;
+        let currentPhone = '';
+        let currentShortId = '';
+
+        // ========== ПРОВЕРКА ПОДКЛЮЧЕНИЯ ==========
+
+        async function testConnection() {
+            const statusEl = document.getElementById('dbStatus');
+            statusEl.innerHTML = '⏳ Проверка подключения...';
+            
+            const result = await DBService.testConnection();
+            
+            if (result.success) {
+                statusEl.innerHTML = '✅ Подключение к базе данных успешно!';
+                statusEl.style.color = '#4CAF50';
+            } else {
+                statusEl.innerHTML = '❌ Ошибка подключения к БД. Проверьте строку подключения.';
+                statusEl.style.color = '#f44336';
+                console.error('Ошибка:', result.error);
+            }
+        }
+
+        // Проверяем при загрузке
+        testConnection();
+
+        // ========== ПЕРЕКЛЮЧЕНИЕ ВКЛАДОК ==========
+
+        window.switchTab = function(tab) {
+            if (tab === 'phone') {
+                document.getElementById('tabPhone').classList.add('active');
+                document.getElementById('tabId').classList.remove('active');
+                document.getElementById('phoneStep1').classList.add('active');
+                document.getElementById('phoneStep2').classList.remove('active');
+                document.getElementById('idLogin').classList.remove('active');
+            } else {
+                document.getElementById('tabId').classList.add('active');
+                document.getElementById('tabPhone').classList.remove('active');
+                document.getElementById('idLogin').classList.add('active');
+                document.getElementById('phoneStep1').classList.remove('active');
+                document.getElementById('phoneStep2').classList.remove('active');
+            }
+        };
+
+        // ========== ФОРМАТИРОВАНИЕ ТЕЛЕФОНА ==========
+
+        window.formatPhone = function(input) {
+            let value = input.value.replace(/\D/g, '');
+            if (value.length > 0) {
+                if (value.length <= 1) {
+                    value = '+7';
+                } else if (value.length <= 4) {
+                    value = '+7 (' + value.slice(1, 4);
+                } else if (value.length <= 7) {
+                    value = '+7 (' + value.slice(1, 4) + ') ' + value.slice(4, 7);
+                } else if (value.length <= 9) {
+                    value = '+7 (' + value.slice(1, 4) + ') ' + value.slice(4, 7) + '-' + value.slice(7, 9);
+                } else {
+                    value = '+7 (' + value.slice(1, 4) + ') ' + value.slice(4, 7) + '-' + value.slice(7, 9) + '-' + value.slice(9, 11);
+                }
+                input.value = value;
+            }
+        };
+
+        // ========== ВХОД ПО ТЕЛЕФОНУ ==========
+
+        window.sendPhoneCode = async function() {
+            const phone = document.getElementById('phoneInput').value;
+            
+            if (!phone) {
+                alert('Введите номер телефона');
+                return;
+            }
+
+            // Ищем пользователя в базе
+            const user = await DBService.getUserByPhone(phone);
+            
+            if (!user) {
+                if (confirm('Пользователь с таким телефоном не найден. Хотите войти по ID?')) {
+                    switchTab('id');
+                }
+                return;
+            }
+
+            // Сохраняем данные
+            currentPhone = phone;
+            currentShortId = user.short_id;
+
+            // Генерируем код (в реальности здесь отправка SMS)
+            const code = '1234';
+            
+            // Сохраняем код в базе (на 5 минут)
+            const expiresAt = new Date(Date.now() + 5 * 60000);
+            await DBService.saveLoginCode(user.short_id, code, expiresAt);
+
+            document.getElementById('sentPhone').textContent = phone;
+            document.getElementById('phoneStep1').classList.remove('active');
+            document.getElementById('phoneStep2').classList.add('active');
+            
+            startTimer();
+            alert(`📱 Код отправлен на ${phone}\n(В демо-режиме: 1234)`);
+        };
+
+        window.verifyPhoneCode = async function() {
+            let code = '';
+            for (let i = 1; i <= 4; i++) {
+                code += document.getElementById(`otp${i}`).value;
+            }
+            
+            if (code.length < 4) {
+                alert('Введите полный код');
+                return;
+            }
+
+            // Проверяем код в базе
+            const validCode = await DBService.verifyLoginCode(currentShortId, code);
+            
+            if (validCode) {
+                // Получаем пользователя
+                const user = await DBService.getUserByPhone(currentPhone);
+                
+                // Сохраняем в localStorage
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                localStorage.setItem('userShortId', user.short_id);
+                
+                // Удаляем использованный код
+                await DBService.deleteLoginCode(currentShortId);
+                
+                showSuccess('Вход выполнен!');
+                setTimeout(() => {
+                    window.location.href = 'index.html';
+                }, 1500);
+            } else {
+                alert('Неверный код');
+            }
+        };
+
+        // ========== ВХОД ПО ID ==========
+
+        window.verifyIdCode = async function() {
+            const shortId = document.getElementById('idInput').value.toUpperCase();
+            const code = document.getElementById('codeInput').value;
+            
+            if (!shortId || !code) {
+                alert('Введите ID и код');
+                return;
+            }
+
+            // Проверяем код в базе
+            const validCode = await DBService.verifyLoginCode(shortId, code);
+            
+            if (validCode) {
+                // Получаем пользователя
+                const user = await DBService.getUserByShortId(shortId);
+                
+                if (user) {
+                    localStorage.setItem('currentUser', JSON.stringify(user));
+                    localStorage.setItem('userShortId', user.short_id);
+                    
+                    await DBService.deleteLoginCode(shortId);
+                    
+                    showSuccess('Вход выполнен!');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 1500);
+                }
+            } else {
+                alert('❌ Неверный код или время истекло. Отправьте /login ' + shortId + ' в боте заново.');
+            }
+        };
+
+        // ========== ТАЙМЕР ==========
+
+        function startTimer() {
+            timeLeft = 120;
+            updateTimer();
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimer();
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    document.getElementById('timer').style.display = 'none';
+                    document.getElementById('resendLink').style.display = 'block';
+                }
+            }, 1000);
+        }
+
+        function updateTimer() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        window.resendCode = function() {
+            sendPhoneCode();
+            document.getElementById('timer').style.display = 'block';
+            document.getElementById('resendLink').style.display = 'none';
+            startTimer();
+        };
+
+        window.moveToNext = function(input, nextId) {
+            if (input.value.length === 1) {
+                const next = document.getElementById(`otp${nextId + 1}`);
+                if (next) next.focus();
+            }
+        };
+
+        window.backToPhoneStep1 = function() {
+            document.getElementById('phoneStep2').classList.remove('active');
+            document.getElementById('phoneStep1').classList.add('active');
+            clearInterval(timerInterval);
+            
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`otp${i}`).value = '';
+            }
+        };
+
+        window.goBack = function() {
+            window.history.back();
+        };
+
+        function showSuccess(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message';
+            successDiv.textContent = message;
+            document.querySelector('.login-card').insertBefore(successDiv, document.querySelector('.login-card').firstChild);
+            
+            setTimeout(() => {
+                successDiv.remove();
+            }, 3000);
+        }
+
+        // Экспортируем для глобального доступа
+        window.testConnection = testConnection;
+    </script>
+</body>
+</html>
